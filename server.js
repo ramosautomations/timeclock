@@ -6,7 +6,9 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-const db = new Database(path.join(__dirname, 'data', 'timeclock.db'));
+const dataDir = path.join(__dirname, 'data');
+if (!require('fs').existsSync(dataDir)) require('fs').mkdirSync(dataDir, { recursive: true });
+const db = new Database(path.join(dataDir, 'timeclock.db'));
 
 // Schema
 db.exec(`
