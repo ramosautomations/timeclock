@@ -130,8 +130,27 @@ app.post('/api/employees', (req, res) => {
   res.json({ id: result.lastInsertRowid, name, is_admin: is_admin ? 1 : 0 });
 });
 
+// Edit employee (admin)
+app.put('/api/employees/:id', (req, res) => {
+  const { name, is_admin } = req.body;
+  if (!name) return res.status(400).json({ error: 'Name required' });
+  db.prepare('UPDATE employees SET name = ?, is_admin = ? WHERE id = ?').run(name, is_admin ? 1 : 0, req.params.id);
+  res.json({ ok: true });
+});
+
+// Reset PIN (admin)
+app.put('/api/employees/:id/pin', (req, res) => {
+  const { pin } = req.body;
+  if (!pin || pin.length < 4) return res.status(400).json({ error: 'PIN must be at least 4 digits' });
+  const existing = db.prepare('SELECT id FROM employees WHERE pin = ? AND id != ?').get(pin, req.params.id);
+  if (existing) return res.status(400).json({ error: 'PIN already in use' });
+  db.prepare('UPDATE employees SET pin = ? WHERE id = ?').run(pin, req.params.id);
+  res.json({ ok: true });
+});
+
 // Delete employee (admin)
 app.delete('/api/employees/:id', (req, res) => {
+  db.prepare('DELETE FROM time_entries WHERE employee_id = ?').run(req.params.id);
   db.prepare('DELETE FROM employees WHERE id = ?').run(req.params.id);
   res.json({ ok: true });
 });

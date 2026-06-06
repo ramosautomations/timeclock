@@ -8,37 +8,21 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 :root {
-  --bg: #0f0f11;
-  --surface: #17171a;
-  --surface2: #1e1e23;
-  --border: rgba(255,255,255,0.08);
-  --border2: rgba(255,255,255,0.15);
-  --text: #f0f0f2;
-  --muted: #7a7a85;
-  --accent: #7cfc98;
-  --accent-dim: rgba(124,252,152,0.12);
-  --accent-dim2: rgba(124,252,152,0.25);
-  --red: #ff5f5f;
-  --red-dim: rgba(255,95,95,0.12);
-  --amber: #ffb547;
-  --amber-dim: rgba(255,181,71,0.15);
-  --blue: #5ba4f5;
-  --blue-dim: rgba(91,164,245,0.12);
-  --radius: 12px;
-  --radius-sm: 8px;
-  --mono: 'DM Mono', monospace;
-  --sans: 'Syne', sans-serif;
+  --bg: #0f0f11; --surface: #17171a; --surface2: #1e1e23;
+  --border: rgba(255,255,255,0.08); --border2: rgba(255,255,255,0.15);
+  --text: #f0f0f2; --muted: #7a7a85;
+  --accent: #ff5f5f; --accent-dim: rgba(255,95,95,0.12); --accent-dim2: rgba(255,95,95,0.25);
+  --red: #ff5f5f; --red-dim: rgba(255,95,95,0.12);
+  --amber: #ffb547; --amber-dim: rgba(255,181,71,0.15);
+  --blue: #5ba4f5; --radius: 12px; --radius-sm: 8px;
+  --mono: 'DM Mono', monospace; --sans: 'Syne', sans-serif;
 }
-
 body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100vh; }
-
-/* ---- SCREENS ---- */
 .screen { display: none; min-height: 100vh; }
 .screen.active { display: flex; flex-direction: column; }
 
-/* ---- LOGIN ---- */
+/* LOGIN */
 #screen-login { align-items: center; justify-content: center; padding: 2rem; }
 .login-box { width: 100%; max-width: 360px; }
 .brand { text-align: center; margin-bottom: 2.5rem; }
@@ -46,12 +30,10 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text); min-
 .brand-icon svg { width: 28px; height: 28px; stroke: var(--accent); }
 .brand h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
 .brand p { font-size: 13px; color: var(--muted); margin-top: 4px; }
-
 .pin-display { display: flex; gap: 10px; justify-content: center; margin-bottom: 2rem; }
 .pin-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--border2); background: transparent; transition: all 0.2s; }
 .pin-dot.filled { background: var(--accent); border-color: var(--accent); }
 .pin-dot.error { background: var(--red); border-color: var(--red); }
-
 .pin-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 .pin-key { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 18px; font-size: 18px; font-weight: 600; font-family: var(--mono); cursor: pointer; transition: all 0.12s; color: var(--text); text-align: center; }
 .pin-key:hover { background: var(--surface2); border-color: var(--border2); transform: scale(0.97); }
@@ -60,92 +42,89 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text); min-
 .pin-key.del { font-size: 13px; color: var(--amber); font-family: var(--sans); }
 .pin-error { text-align: center; font-size: 13px; color: var(--red); margin-top: 1rem; min-height: 20px; }
 
-/* ---- EMPLOYEE HOME ---- */
+/* EMPLOYEE */
 #screen-employee { padding: 0; }
 .emp-header { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); }
 .emp-greeting { font-size: 15px; font-weight: 600; }
 .emp-greeting span { color: var(--muted); font-weight: 400; }
 .btn-logout { background: none; border: 1px solid var(--border); color: var(--muted); font-size: 12px; font-family: var(--sans); padding: 6px 14px; border-radius: 99px; cursor: pointer; }
 .btn-logout:hover { border-color: var(--border2); color: var(--text); }
-
 .emp-body { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 2rem 1.5rem; max-width: 480px; margin: 0 auto; width: 100%; }
-
 .clock-hero { text-align: center; margin-bottom: 2.5rem; width: 100%; }
 .live-time { font-family: var(--mono); font-size: 52px; font-weight: 500; letter-spacing: 2px; color: var(--text); line-height: 1; }
 .live-date { font-size: 14px; color: var(--muted); margin-top: 8px; }
-
 .status-pill { display: inline-flex; align-items: center; gap: 8px; padding: 6px 18px; border-radius: 99px; font-size: 13px; font-weight: 500; margin: 1.5rem 0; }
 .status-pill.out { background: var(--surface2); border: 1px solid var(--border2); color: var(--muted); }
 .status-pill.in { background: var(--accent-dim); border: 1px solid var(--accent); color: var(--accent); }
 .status-dot { width: 8px; height: 8px; border-radius: 50%; }
 .status-pill.out .status-dot { background: var(--muted); }
 .status-pill.in .status-dot { background: var(--accent); animation: pulse 1.5s infinite; }
-@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
-
+@keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.4} }
 .duration-counter { font-family: var(--mono); font-size: 18px; color: var(--accent); margin-bottom: 1.5rem; min-height: 28px; }
-
 .btn-clock { width: 100%; padding: 18px; border-radius: var(--radius); font-size: 16px; font-weight: 700; font-family: var(--sans); letter-spacing: 0.5px; cursor: pointer; border: none; transition: all 0.15s; }
-.btn-clock.clock-in { background: var(--accent); color: #0a1a0f; }
+.btn-clock.clock-in { background: var(--accent); color: #fff; }
 .btn-clock.clock-in:hover { background: #90ffaa; transform: translateY(-1px); }
 .btn-clock.clock-out { background: var(--red-dim); border: 1px solid var(--red); color: var(--red); }
 .btn-clock.clock-out:hover { background: rgba(255,95,95,0.22); transform: translateY(-1px); }
-.btn-clock:active { transform: translateY(0) scale(0.99); }
-
 .today-section { width: 100%; margin-top: 2rem; }
 .section-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 12px; }
 .log-list { display: flex; flex-direction: column; gap: 8px; }
 .log-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; }
 .log-times { font-family: var(--mono); font-size: 13px; }
-.log-in { color: var(--accent); }
-.log-arrow { color: var(--muted); margin: 0 6px; }
-.log-out { color: var(--red); }
-.log-dur { font-size: 13px; color: var(--muted); }
-.log-dur.ot { color: var(--amber); }
+.log-in { color: var(--accent); } .log-arrow { color: var(--muted); margin: 0 6px; } .log-out { color: var(--red); }
+.log-dur { font-size: 13px; color: var(--muted); } .log-dur.ot { color: var(--amber); }
 .empty-log { font-size: 13px; color: var(--muted); text-align: center; padding: 1.5rem; }
 
-/* ---- ADMIN SCREEN ---- */
+/* ADMIN */
 #screen-admin { flex-direction: column; }
 .admin-header { display: flex; align-items: center; gap: 16px; padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
 .admin-title { font-size: 16px; font-weight: 700; }
+.admin-nav { display: flex; gap: 6px; margin-left: 16px; }
+.nav-tab { background: none; border: 1px solid var(--border); color: var(--muted); font-size: 13px; font-family: var(--sans); font-weight: 500; padding: 6px 16px; border-radius: 99px; cursor: pointer; transition: all 0.15s; }
+.nav-tab.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+.nav-tab:hover:not(.active) { border-color: var(--border2); color: var(--text); }
 .admin-controls { display: flex; gap: 10px; align-items: center; margin-left: auto; flex-wrap: wrap; }
 .admin-controls select { background: var(--surface); border: 1px solid var(--border); color: var(--text); font-size: 13px; font-family: var(--sans); padding: 7px 12px; border-radius: var(--radius-sm); }
 .btn-add-emp { background: var(--accent-dim); border: 1px solid var(--accent); color: var(--accent); font-size: 13px; font-family: var(--sans); font-weight: 600; padding: 7px 16px; border-radius: var(--radius-sm); cursor: pointer; }
 .btn-add-emp:hover { background: var(--accent-dim2); }
-
 .admin-body { flex: 1; padding: 1.5rem; overflow-y: auto; }
-
+.admin-panel { display: none; } .admin-panel.active { display: block; }
 .metrics-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 2rem; }
 .metric-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; }
 .metric-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
 .metric-val { font-size: 28px; font-weight: 700; font-family: var(--mono); }
-.metric-val.green { color: var(--accent); }
-.metric-val.amber { color: var(--amber); }
-.metric-val.blue { color: var(--blue); }
+.metric-val.green { color: var(--accent); } .metric-val.amber { color: var(--amber); } .metric-val.blue { color: var(--blue); }
 .metric-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
-
 .report-table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
 table { width: 100%; border-collapse: collapse; font-size: 13px; }
 thead th { text-align: left; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--surface2); }
 tbody td { padding: 14px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
 tbody tr:last-child td { border-bottom: none; }
-tbody tr:hover td { background: var(--surface2); }
+tbody tr.data-row:hover td { background: var(--surface2); }
 .emp-name { font-weight: 600; font-size: 14px; }
-.emp-avatar { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; background: var(--accent-dim); color: var(--accent); font-size: 11px; font-weight: 700; margin-right: 10px; flex-shrink: 0; }
+.emp-avatar { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.08); color: #fff; font-size: 11px; font-weight: 700; margin-right: 10px; flex-shrink: 0; }
 .hrs-cell { font-family: var(--mono); font-weight: 500; }
 .ot-cell { font-family: var(--mono); color: var(--amber); font-weight: 500; }
-.detail-row { display: none; }
-.detail-row.open { display: table-row; }
+.detail-row { display: none; } .detail-row.open { display: table-row; }
 .detail-inner { padding: 12px 16px 16px 56px; background: var(--surface2); }
 .detail-entry { display: grid; grid-template-columns: 100px 1fr 1fr 80px; gap: 8px; font-size: 12px; font-family: var(--mono); padding: 5px 0; border-bottom: 1px solid var(--border); color: var(--muted); }
 .detail-entry:last-child { border-bottom: none; }
-.detail-entry .din { color: var(--accent); }
-.detail-entry .dout { color: var(--red); }
-.detail-entry .ddur { color: var(--text); }
+.detail-entry .din { color: var(--accent); } .detail-entry .dout { color: var(--red); } .detail-entry .ddur { color: var(--text); }
 .toggle-btn { background: none; border: 1px solid var(--border); color: var(--muted); font-size: 11px; font-family: var(--sans); padding: 4px 10px; border-radius: 99px; cursor: pointer; }
 .toggle-btn:hover { border-color: var(--border2); color: var(--text); }
 
-/* ---- MODAL ---- */
-.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; }
+/* EMPLOYEE MANAGEMENT TABLE */
+.emp-mgmt-table { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.emp-mgmt-table table { width: 100%; }
+.action-btn { background: none; border: 1px solid var(--border); color: var(--muted); font-size: 11px; font-family: var(--sans); padding: 5px 12px; border-radius: 99px; cursor: pointer; margin-right: 6px; transition: all 0.15s; }
+.action-btn:hover { border-color: var(--border2); color: var(--text); }
+.action-btn.edit:hover { border-color: var(--blue); color: var(--blue); }
+.action-btn.pin:hover { border-color: var(--amber); color: var(--amber); }
+.action-btn.del:hover { border-color: var(--red); color: var(--red); }
+.badge-admin { background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent); font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 99px; margin-left: 8px; }
+
+/* MODAL */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; padding: 1rem; }
 .modal-overlay.open { display: flex; }
 .modal { background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius); padding: 2rem; width: 100%; max-width: 380px; }
 .modal h2 { font-size: 18px; font-weight: 700; margin-bottom: 1.5rem; }
@@ -156,12 +135,12 @@ tbody tr:hover td { background: var(--surface2); }
 .modal-check { display: flex; align-items: center; gap: 10px; font-size: 13px; margin-bottom: 1.5rem; }
 .modal-check input { width: auto; }
 .modal-actions { display: flex; gap: 10px; }
-.btn-primary { flex: 1; background: var(--accent); color: #0a1a0f; font-weight: 700; font-family: var(--sans); border: none; padding: 11px; border-radius: var(--radius-sm); cursor: pointer; font-size: 14px; }
+.btn-primary { flex: 1; background: var(--accent); color: #fff; font-weight: 700; font-family: var(--sans); border: none; padding: 11px; border-radius: var(--radius-sm); cursor: pointer; font-size: 14px; }
+.btn-primary.danger { background: var(--red); color: #fff; }
 .btn-cancel { flex: 1; background: none; border: 1px solid var(--border2); color: var(--muted); font-family: var(--sans); padding: 11px; border-radius: var(--radius-sm); cursor: pointer; font-size: 14px; }
 .modal-error { font-size: 13px; color: var(--red); margin-bottom: 1rem; min-height: 20px; }
-
-/* ---- LOADING ---- */
-.loading { display: flex; align-items: center; justify-content: center; min-height: 100vh; color: var(--muted); font-size: 14px; }
+.modal-success { font-size: 13px; color: var(--accent); margin-bottom: 1rem; min-height: 20px; }
+.modal-info { font-size: 13px; color: var(--muted); margin-bottom: 1.25rem; line-height: 1.5; }
 </style>
 </head>
 <body>
@@ -172,18 +151,15 @@ tbody tr:hover td { background: var(--surface2); }
     <div class="brand">
       <div class="brand-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"/>
-          <polyline points="12 6 12 12 16 14"/>
+          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
         </svg>
       </div>
       <h1>TimeClock</h1>
       <p>Enter your PIN to continue</p>
     </div>
     <div class="pin-display" id="pin-display">
-      <div class="pin-dot" id="dot-0"></div>
-      <div class="pin-dot" id="dot-1"></div>
-      <div class="pin-dot" id="dot-2"></div>
-      <div class="pin-dot" id="dot-3"></div>
+      <div class="pin-dot" id="dot-0"></div><div class="pin-dot" id="dot-1"></div>
+      <div class="pin-dot" id="dot-2"></div><div class="pin-dot" id="dot-3"></div>
     </div>
     <div class="pin-grid">
       <button class="pin-key" onclick="pinKey('1')">1</button>
@@ -214,8 +190,7 @@ tbody tr:hover td { background: var(--surface2); }
       <div class="live-time" id="live-time">00:00:00</div>
       <div class="live-date" id="live-date"></div>
       <div class="status-pill out" id="status-pill">
-        <span class="status-dot"></span>
-        <span id="status-text">Clocked Out</span>
+        <span class="status-dot"></span><span id="status-text">Clocked Out</span>
       </div>
       <div class="duration-counter" id="duration-counter"></div>
     </div>
@@ -231,114 +206,144 @@ tbody tr:hover td { background: var(--surface2); }
 <div id="screen-admin" class="screen">
   <div class="admin-header">
     <div class="admin-title">⏱ TimeClock Admin</div>
-    <div class="admin-controls">
-      <select id="period-select" onchange="loadReport()">
-        <option value="">Loading periods…</option>
-      </select>
-      <select id="emp-filter" onchange="loadReport()">
-        <option value="">All employees</option>
-      </select>
-      <button class="btn-add-emp" onclick="openAddModal()">+ Add Employee</button>
-      <button class="btn-logout" onclick="logout()">Sign out</button>
+    <div class="admin-nav">
+      <button class="nav-tab active" id="tab-reports" onclick="switchAdminTab('reports')">Reports</button>
+      <button class="nav-tab" id="tab-employees" onclick="switchAdminTab('employees')">Employees</button>
     </div>
+    <div class="admin-controls" id="report-controls">
+      <select id="period-select" onchange="loadReport()"><option value="">Loading…</option></select>
+      <select id="emp-filter" onchange="loadReport()"><option value="">All employees</option></select>
+    </div>
+    <div class="admin-controls" id="emp-controls" style="display:none">
+      <button class="btn-add-emp" onclick="openAddModal()">+ Add Employee</button>
+    </div>
+    <button class="btn-logout" onclick="logout()">Sign out</button>
   </div>
   <div class="admin-body">
-    <div class="metrics-row" id="metrics-row"></div>
-    <div class="report-table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Employee</th>
-            <th>Days worked</th>
-            <th>Regular hrs</th>
-            <th>Overtime hrs</th>
-            <th>Total hrs</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="report-tbody"></tbody>
-      </table>
+    <!-- REPORTS TAB -->
+    <div class="admin-panel active" id="panel-reports">
+      <div class="metrics-row" id="metrics-row"></div>
+      <div class="report-table-wrap">
+        <table>
+          <thead><tr>
+            <th>Employee</th><th>Days worked</th><th>Regular hrs</th>
+            <th>Overtime hrs</th><th>Total hrs</th><th></th>
+          </tr></thead>
+          <tbody id="report-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <!-- EMPLOYEES TAB -->
+    <div class="admin-panel" id="panel-employees">
+      <div class="emp-mgmt-table">
+        <table>
+          <thead><tr>
+            <th>Employee</th><th>Role</th><th>Actions</th>
+          </tr></thead>
+          <tbody id="emp-tbody"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- ADD EMPLOYEE MODAL -->
+<!-- MODAL: ADD EMPLOYEE -->
 <div class="modal-overlay" id="modal-add">
   <div class="modal">
     <h2>Add Employee</h2>
-    <div class="modal-error" id="modal-error"></div>
-    <div class="modal-field">
-      <label>Full name</label>
-      <input id="new-name" type="text" placeholder="Jane Smith" />
-    </div>
-    <div class="modal-field">
-      <label>PIN (4+ digits)</label>
-      <input id="new-pin" type="password" placeholder="••••" maxlength="8" inputmode="numeric" />
-    </div>
-    <div class="modal-check">
-      <input type="checkbox" id="new-admin" />
-      <label for="new-admin">Admin access</label>
-    </div>
+    <div class="modal-error" id="modal-add-error"></div>
+    <div class="modal-field"><label>Full name</label><input id="new-name" type="text" placeholder="Jane Smith" /></div>
+    <div class="modal-field"><label>PIN (4+ digits)</label><input id="new-pin" type="password" placeholder="••••" maxlength="8" inputmode="numeric" /></div>
+    <div class="modal-check"><input type="checkbox" id="new-admin" /><label for="new-admin">Admin access</label></div>
     <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-cancel" onclick="closeAllModals()">Cancel</button>
       <button class="btn-primary" onclick="addEmployee()">Add Employee</button>
     </div>
   </div>
 </div>
 
+<!-- MODAL: EDIT EMPLOYEE -->
+<div class="modal-overlay" id="modal-edit">
+  <div class="modal">
+    <h2>Edit Employee</h2>
+    <div class="modal-error" id="modal-edit-error"></div>
+    <div class="modal-success" id="modal-edit-success"></div>
+    <div class="modal-field"><label>Full name</label><input id="edit-name" type="text" /></div>
+    <div class="modal-check"><input type="checkbox" id="edit-admin" /><label for="edit-admin">Admin access</label></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeAllModals()">Cancel</button>
+      <button class="btn-primary" onclick="saveEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: RESET PIN -->
+<div class="modal-overlay" id="modal-pin">
+  <div class="modal">
+    <h2>Reset PIN</h2>
+    <div class="modal-error" id="modal-pin-error"></div>
+    <div class="modal-success" id="modal-pin-success"></div>
+    <div class="modal-info" id="modal-pin-info"></div>
+    <div class="modal-field"><label>New PIN (4–8 digits)</label><input id="reset-pin" type="password" placeholder="••••" maxlength="8" inputmode="numeric" /></div>
+    <div class="modal-field"><label>Confirm PIN</label><input id="reset-pin2" type="password" placeholder="••••" maxlength="8" inputmode="numeric" /></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeAllModals()">Cancel</button>
+      <button class="btn-primary" onclick="savePin()">Reset PIN</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: DELETE CONFIRM -->
+<div class="modal-overlay" id="modal-delete">
+  <div class="modal">
+    <h2>Remove Employee</h2>
+    <div class="modal-info" id="modal-delete-info"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeAllModals()">Cancel</button>
+      <button class="btn-primary danger" onclick="confirmDelete()">Yes, Remove</button>
+    </div>
+  </div>
+</div>
+
 <script>
-let currentUser = null;
-let pinBuffer = '';
-let clockedIn = false;
-let clockInTime = null;
-let durationTimer = null;
-let clockTick = null;
+let currentUser = null, pinBuffer = '', clockedIn = false, clockInTime = null;
+let durationTimer = null, clockTick = null, editingEmpId = null;
 
 // ---- PIN LOGIN ----
 function pinKey(d) {
   if (pinBuffer.length >= 8) return;
-  pinBuffer += d;
-  updateDots();
+  pinBuffer += d; updateDots();
   if (pinBuffer.length >= 4) tryLogin();
 }
 function delPin() { pinBuffer = pinBuffer.slice(0,-1); updateDots(); clearError(); }
 function clearPin() { pinBuffer = ''; updateDots(); clearError(); }
 function clearError() { document.getElementById('pin-error').textContent = ''; }
-
 function updateDots() {
   [0,1,2,3].forEach(i => {
-    const dot = document.getElementById('dot-' + i);
+    const dot = document.getElementById('dot-'+i);
     dot.classList.toggle('filled', i < pinBuffer.length);
     dot.classList.remove('error');
   });
 }
-
 async function tryLogin() {
   try {
-    const res = await fetch('/api/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ pin: pinBuffer }) });
+    const res = await fetch('/api/login', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pin:pinBuffer})});
     if (!res.ok) {
       [0,1,2,3].forEach(i => document.getElementById('dot-'+i).classList.add('error'));
       document.getElementById('pin-error').textContent = 'Invalid PIN. Please try again.';
-      setTimeout(() => { pinBuffer = ''; updateDots(); clearError(); }, 1000);
+      setTimeout(() => { pinBuffer=''; updateDots(); clearError(); }, 1000);
       return;
     }
     const user = await res.json();
-    currentUser = user;
-    pinBuffer = '';
-    updateDots();
-    if (user.is_admin) showAdmin();
-    else showEmployee();
+    currentUser = user; pinBuffer=''; updateDots();
+    if (user.is_admin) showAdmin(); else showEmployee();
   } catch(e) {
-    document.getElementById('pin-error').textContent = 'Connection error. Is the server running?';
-    pinBuffer = '';
-    updateDots();
+    document.getElementById('pin-error').textContent = 'Connection error.';
+    pinBuffer=''; updateDots();
   }
 }
-
 function logout() {
-  currentUser = null;
-  pinBuffer = '';
-  updateDots();
+  currentUser = null; pinBuffer=''; updateDots();
   if (durationTimer) clearInterval(durationTimer);
   if (clockTick) clearInterval(clockTick);
   showScreen('login');
@@ -348,167 +353,126 @@ function logout() {
 async function showEmployee() {
   showScreen('employee');
   document.getElementById('emp-name-display').textContent = currentUser.name;
-  startClock();
-  await refreshStatus();
-  await loadTodayLog();
+  startClock(); await refreshStatus(); await loadTodayLog();
 }
-
 function startClock() {
   if (clockTick) clearInterval(clockTick);
   function tick() {
     const now = new Date();
-    document.getElementById('live-time').textContent = now.toLocaleTimeString('en-US', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
-    document.getElementById('live-date').textContent = now.toLocaleDateString('en-US', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    document.getElementById('live-time').textContent = now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    document.getElementById('live-date').textContent = now.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
   }
-  tick();
-  clockTick = setInterval(tick, 1000);
+  tick(); clockTick = setInterval(tick, 1000);
 }
-
 async function refreshStatus() {
-  const res = await fetch('/api/status/' + currentUser.id);
+  const res = await fetch('/api/status/'+currentUser.id);
   const data = await res.json();
   clockedIn = data.clocked_in;
   const btn = document.getElementById('clock-btn');
   const pill = document.getElementById('status-pill');
-  const st = document.getElementById('status-text');
   if (clockedIn) {
     clockInTime = new Date(data.entry.clock_in);
-    btn.textContent = 'Clock Out';
-    btn.className = 'btn-clock clock-out';
-    pill.className = 'status-pill in';
-    st.textContent = 'Clocked In';
+    btn.textContent='Clock Out'; btn.className='btn-clock clock-out';
+    pill.className='status-pill in'; document.getElementById('status-text').textContent='Clocked In';
     startDurationCounter();
   } else {
-    clockInTime = null;
-    btn.textContent = 'Clock In';
-    btn.className = 'btn-clock clock-in';
-    pill.className = 'status-pill out';
-    st.textContent = 'Clocked Out';
-    document.getElementById('duration-counter').textContent = '';
+    clockInTime=null; btn.textContent='Clock In'; btn.className='btn-clock clock-in';
+    pill.className='status-pill out'; document.getElementById('status-text').textContent='Clocked Out';
+    document.getElementById('duration-counter').textContent='';
     if (durationTimer) clearInterval(durationTimer);
   }
 }
-
 function startDurationCounter() {
   if (durationTimer) clearInterval(durationTimer);
   function update() {
-    const elapsed = Math.round((Date.now() - clockInTime.getTime()) / 1000);
-    const h = Math.floor(elapsed/3600), m = Math.floor((elapsed%3600)/60), s = elapsed%60;
-    const str = `${pad(h)}:${pad(m)}:${pad(s)}`;
-    document.getElementById('duration-counter').textContent = elapsed >= 28800 ? str + ' ⚡ OT' : str;
+    const elapsed = Math.round((Date.now()-clockInTime.getTime())/1000);
+    const h=Math.floor(elapsed/3600), m=Math.floor((elapsed%3600)/60), s=elapsed%60;
+    document.getElementById('duration-counter').textContent = `${pad(h)}:${pad(m)}:${pad(s)}` + (elapsed>=28800?' ⚡ OT':'');
   }
-  update();
-  durationTimer = setInterval(update, 1000);
+  update(); durationTimer = setInterval(update, 1000);
 }
-
 function pad(n) { return n.toString().padStart(2,'0'); }
-
 async function toggleClock() {
-  const endpoint = clockedIn ? '/api/clockout' : '/api/clockin';
-  await fetch(endpoint, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ employee_id: currentUser.id }) });
-  await refreshStatus();
-  await loadTodayLog();
+  const ep = clockedIn ? '/api/clockout' : '/api/clockin';
+  await fetch(ep,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({employee_id:currentUser.id})});
+  await refreshStatus(); await loadTodayLog();
 }
-
 async function loadTodayLog() {
-  const res = await fetch('/api/today/' + currentUser.id);
+  const res = await fetch('/api/today/'+currentUser.id);
   const entries = await res.json();
   const list = document.getElementById('log-list');
-  if (!entries.length) { list.innerHTML = '<div class="empty-log">No entries yet today</div>'; return; }
-
+  if (!entries.length) { list.innerHTML='<div class="empty-log">No entries yet today</div>'; return; }
   list.innerHTML = entries.map(e => {
-    const inTime = new Date(e.clock_in).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-    const outTime = e.clock_out ? new Date(e.clock_out).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'}) : null;
-    let dur = '';
-    let isOT = false;
-    if (e.clock_out) {
-      const mins = Math.round((new Date(e.clock_out) - new Date(e.clock_in)) / 60000);
-      dur = fmtDur(mins);
-      isOT = e.overtime_mins > 0;
-    }
+    const inT = new Date(e.clock_in).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    const outT = e.clock_out ? new Date(e.clock_out).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'}) : null;
+    const mins = e.clock_out ? Math.round((new Date(e.clock_out)-new Date(e.clock_in))/60000) : null;
+    const dur = mins ? fmtDur(mins) : '';
     return `<div class="log-item">
-      <div class="log-times">
-        <span class="log-in">${inTime}</span>
-        ${outTime ? `<span class="log-arrow">→</span><span class="log-out">${outTime}</span>` : '<span class="log-arrow"> ongoing…</span>'}
-      </div>
-      ${dur ? `<div class="log-dur ${isOT?'ot':''}">${dur}${isOT?' ⚡':''}</div>` : ''}
+      <div class="log-times"><span class="log-in">${inT}</span>${outT?`<span class="log-arrow">→</span><span class="log-out">${outT}</span>`:'<span class="log-arrow"> ongoing…</span>'}</div>
+      ${dur?`<div class="log-dur ${e.overtime_mins>0?'ot':''}">${dur}${e.overtime_mins>0?' ⚡':''}</div>`:''}
     </div>`;
   }).join('');
 }
-
-function fmtDur(mins) {
-  const h = Math.floor(mins/60), m = mins%60;
-  return h > 0 ? `${h}h ${m}m` : `${m}m`;
-}
+function fmtDur(mins) { const h=Math.floor(mins/60),m=mins%60; return h>0?`${h}h ${m}m`:`${m}m`; }
 
 // ---- ADMIN VIEW ----
 async function showAdmin() {
   showScreen('admin');
-  await loadPeriods();
-  await loadEmpFilter();
-  await loadReport();
+  switchAdminTab('reports');
+  await loadPeriods(); await loadEmpFilter(); await loadReport();
 }
-
+function switchAdminTab(tab) {
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  document.getElementById('panel-'+tab).classList.add('active');
+  document.getElementById('report-controls').style.display = tab==='reports' ? 'flex' : 'none';
+  document.getElementById('emp-controls').style.display = tab==='employees' ? 'flex' : 'none';
+  if (tab==='employees') loadEmpTable();
+}
 async function loadPeriods() {
   const res = await fetch('/api/payperiods');
   const periods = await res.json();
-  const sel = document.getElementById('period-select');
-  sel.innerHTML = periods.map((p,i) =>
+  document.getElementById('period-select').innerHTML = periods.map((p,i)=>
     `<option value="${p.start}|${p.end}" ${i===0?'selected':''}>${fmt(p.start)} – ${fmt(p.end)}</option>`
   ).join('');
 }
-
 async function loadEmpFilter() {
   const res = await fetch('/api/employees');
   const emps = await res.json();
-  const sel = document.getElementById('emp-filter');
-  sel.innerHTML = '<option value="">All employees</option>' + emps.filter(e=>!e.is_admin).map(e =>
-    `<option value="${e.id}">${e.name}</option>`
-  ).join('');
+  document.getElementById('emp-filter').innerHTML = '<option value="">All employees</option>' +
+    emps.filter(e=>!e.is_admin).map(e=>`<option value="${e.id}">${e.name}</option>`).join('');
 }
-
 async function loadReport() {
-  const periodVal = document.getElementById('period-select').value;
-  if (!periodVal) return;
-  const [start, end] = periodVal.split('|');
+  const val = document.getElementById('period-select').value;
+  if (!val) return;
+  const [start,end] = val.split('|');
   const empFilter = document.getElementById('emp-filter').value;
   let url = `/api/report?start=${start}&end=${end}`;
   if (empFilter) url += `&employee_id=${empFilter}`;
-
   const res = await fetch(url);
   const rows = await res.json();
-
-  let totalReg = 0, totalOT = 0, totalAll = 0;
-  rows.forEach(r => { totalReg += r.totalRegular; totalOT += r.totalOvertime; totalAll += r.totalMins; });
-
+  let totalReg=0, totalOT=0, totalAll=0;
+  rows.forEach(r => { totalReg+=r.totalRegular; totalOT+=r.totalOvertime; totalAll+=r.totalMins; });
   document.getElementById('metrics-row').innerHTML = `
     <div class="metric-card"><div class="metric-label">Regular hours</div><div class="metric-val green">${(totalReg/60).toFixed(1)}</div><div class="metric-sub">this period</div></div>
     <div class="metric-card"><div class="metric-label">Overtime hours</div><div class="metric-val amber">${(totalOT/60).toFixed(1)}</div><div class="metric-sub">&gt;8h/day · &gt;40h/wk</div></div>
     <div class="metric-card"><div class="metric-label">Total hours</div><div class="metric-val blue">${(totalAll/60).toFixed(1)}</div><div class="metric-sub">all employees</div></div>
-    <div class="metric-card"><div class="metric-label">Employees</div><div class="metric-val">${rows.filter(r=>r.totalMins>0).length}</div><div class="metric-sub">with entries</div></div>
-  `;
-
+    <div class="metric-card"><div class="metric-label">Employees</div><div class="metric-val">${rows.filter(r=>r.totalMins>0).length}</div><div class="metric-sub">with entries</div></div>`;
   document.getElementById('report-tbody').innerHTML = rows.map(r => {
     const initials = r.employee.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-    const regHrs = (r.totalRegular/60).toFixed(2);
-    const otHrs = (r.totalOvertime/60).toFixed(2);
-    const totalHrs = (r.totalMins/60).toFixed(2);
     const details = r.entries.filter(e=>e.clock_out).map(e => {
-      const date = e.clock_in.slice(0,10);
       const inT = new Date(e.clock_in).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
       const outT = new Date(e.clock_out).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
-      const mins = e.durationMins;
-      const flag = e.overtime_mins > 0 ? ' ⚡' : '';
-      return `<div class="detail-entry"><span>${date}</span><span class="din">${inT}</span><span class="dout">${outT}</span><span class="ddur">${fmtDur(mins)}${flag}</span></div>`;
+      return `<div class="detail-entry"><span>${e.clock_in.slice(0,10)}</span><span class="din">${inT}</span><span class="dout">${outT}</span><span class="ddur">${fmtDur(e.durationMins)}${e.overtime_mins>0?' ⚡':''}</span></div>`;
     }).join('') || '<div style="font-size:12px;color:var(--muted);padding:6px 0">No entries this period</div>';
-
     return `
-      <tr>
+      <tr class="data-row">
         <td><span class="emp-avatar">${initials}</span><span class="emp-name">${r.employee.name}</span></td>
         <td>${r.days}</td>
-        <td class="hrs-cell">${regHrs}</td>
-        <td class="ot-cell">${otHrs > '0.00' ? '⚡ ' + otHrs : '—'}</td>
-        <td class="hrs-cell">${totalHrs}</td>
+        <td class="hrs-cell">${(r.totalRegular/60).toFixed(2)}</td>
+        <td class="ot-cell">${r.totalOvertime>0?'⚡ '+(r.totalOvertime/60).toFixed(2):'—'}</td>
+        <td class="hrs-cell">${(r.totalMins/60).toFixed(2)}</td>
         <td><button class="toggle-btn" onclick="toggleDetail(${r.employee.id})">details</button></td>
       </tr>
       <tr class="detail-row" id="detail-${r.employee.id}">
@@ -516,41 +480,107 @@ async function loadReport() {
       </tr>`;
   }).join('');
 }
+function toggleDetail(id) { document.getElementById('detail-'+id).classList.toggle('open'); }
+function fmt(d) { return new Date(d+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }
 
-function toggleDetail(id) {
-  document.getElementById('detail-' + id).classList.toggle('open');
+// ---- EMPLOYEE MANAGEMENT ----
+async function loadEmpTable() {
+  const res = await fetch('/api/employees');
+  const emps = await res.json();
+  document.getElementById('emp-tbody').innerHTML = emps.map(e => {
+    const initials = e.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    return `<tr class="data-row">
+      <td><span class="emp-avatar">${initials}</span><span class="emp-name">${e.name}</span>${e.is_admin?'<span class="badge-admin">Admin</span>':''}</td>
+      <td>${e.is_admin ? 'Administrator' : 'Employee'}</td>
+      <td>
+        <button class="action-btn edit" onclick="openEditModal(${e.id},'${e.name.replace(/'/g,"\\'")}',${e.is_admin})">✏ Edit</button>
+        <button class="action-btn pin" onclick="openPinModal(${e.id},'${e.name.replace(/'/g,"\\'")}')">🔑 Reset PIN</button>
+        <button class="action-btn del" onclick="openDeleteModal(${e.id},'${e.name.replace(/'/g,"\\'")}')">✕ Remove</button>
+      </td>
+    </tr>`;
+  }).join('');
 }
 
-function fmt(d) {
-  return new Date(d + 'T12:00:00').toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
-}
-
-// ---- ADD EMPLOYEE MODAL ----
+// ADD
 function openAddModal() {
+  closeAllModals();
+  document.getElementById('modal-add-error').textContent='';
+  document.getElementById('new-name').value='';
+  document.getElementById('new-pin').value='';
+  document.getElementById('new-admin').checked=false;
   document.getElementById('modal-add').classList.add('open');
-  document.getElementById('modal-error').textContent = '';
-  document.getElementById('new-name').value = '';
-  document.getElementById('new-pin').value = '';
-  document.getElementById('new-admin').checked = false;
 }
-function closeModal() { document.getElementById('modal-add').classList.remove('open'); }
-
 async function addEmployee() {
-  const name = document.getElementById('new-name').value.trim();
-  const pin = document.getElementById('new-pin').value.trim();
-  const is_admin = document.getElementById('new-admin').checked;
-  if (!name || !pin) { document.getElementById('modal-error').textContent = 'Name and PIN are required.'; return; }
-  const res = await fetch('/api/employees', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({name,pin,is_admin}) });
+  const name=document.getElementById('new-name').value.trim();
+  const pin=document.getElementById('new-pin').value.trim();
+  const is_admin=document.getElementById('new-admin').checked;
+  if (!name||!pin) { document.getElementById('modal-add-error').textContent='Name and PIN are required.'; return; }
+  const res = await fetch('/api/employees',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,pin,is_admin})});
   const data = await res.json();
-  if (!res.ok) { document.getElementById('modal-error').textContent = data.error; return; }
-  closeModal();
-  await loadEmpFilter();
-  await loadReport();
+  if (!res.ok) { document.getElementById('modal-add-error').textContent=data.error; return; }
+  closeAllModals(); await loadEmpFilter(); await loadEmpTable();
 }
 
+// EDIT
+function openEditModal(id, name, is_admin) {
+  closeAllModals(); editingEmpId=id;
+  document.getElementById('modal-edit-error').textContent='';
+  document.getElementById('modal-edit-success').textContent='';
+  document.getElementById('edit-name').value=name;
+  document.getElementById('edit-admin').checked=!!is_admin;
+  document.getElementById('modal-edit').classList.add('open');
+}
+async function saveEdit() {
+  const name=document.getElementById('edit-name').value.trim();
+  const is_admin=document.getElementById('edit-admin').checked;
+  if (!name) { document.getElementById('modal-edit-error').textContent='Name is required.'; return; }
+  const res = await fetch(`/api/employees/${editingEmpId}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,is_admin})});
+  const data = await res.json();
+  if (!res.ok) { document.getElementById('modal-edit-error').textContent=data.error; return; }
+  document.getElementById('modal-edit-success').textContent='✓ Saved!';
+  await loadEmpFilter(); await loadEmpTable();
+  setTimeout(closeAllModals, 800);
+}
+
+// RESET PIN
+function openPinModal(id, name) {
+  closeAllModals(); editingEmpId=id;
+  document.getElementById('modal-pin-error').textContent='';
+  document.getElementById('modal-pin-success').textContent='';
+  document.getElementById('modal-pin-info').textContent=`Resetting PIN for: ${name}`;
+  document.getElementById('reset-pin').value='';
+  document.getElementById('reset-pin2').value='';
+  document.getElementById('modal-pin').classList.add('open');
+}
+async function savePin() {
+  const pin=document.getElementById('reset-pin').value.trim();
+  const pin2=document.getElementById('reset-pin2').value.trim();
+  if (!pin||pin.length<4) { document.getElementById('modal-pin-error').textContent='PIN must be at least 4 digits.'; return; }
+  if (pin!==pin2) { document.getElementById('modal-pin-error').textContent='PINs do not match.'; return; }
+  const res = await fetch(`/api/employees/${editingEmpId}/pin`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({pin})});
+  const data = await res.json();
+  if (!res.ok) { document.getElementById('modal-pin-error').textContent=data.error; return; }
+  document.getElementById('modal-pin-success').textContent='✓ PIN updated!';
+  setTimeout(closeAllModals, 800);
+}
+
+// DELETE
+function openDeleteModal(id, name) {
+  closeAllModals(); editingEmpId=id;
+  document.getElementById('modal-delete-info').textContent=`Remove "${name}"? This will permanently delete their account and all time entries.`;
+  document.getElementById('modal-delete').classList.add('open');
+}
+async function confirmDelete() {
+  await fetch(`/api/employees/${editingEmpId}`,{method:'DELETE'});
+  closeAllModals(); await loadEmpFilter(); await loadEmpTable();
+}
+
+function closeAllModals() {
+  document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('open'));
+}
 function showScreen(name) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-' + name).classList.add('active');
+  document.getElementById('screen-'+name).classList.add('active');
 }
 </script>
 </body>
