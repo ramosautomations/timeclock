@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>TimeClock</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -50,7 +50,7 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 .pin-dot.error { background: var(--accent); border-color: var(--accent); animation: shake 0.4s; }
 @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
 .pin-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-.pin-key { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 20px 10px; font-size: 20px; font-weight: 600; font-family: var(--mono); cursor: pointer; transition: all 0.1s; color: var(--text); text-align: center; user-select: none; }
+.pin-key { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 20px 10px; font-size: 20px; font-weight: 600; font-family: var(--mono); cursor: pointer; transition: all 0.1s; color: var(--text); text-align: center; user-select: none; touch-action: manipulation; }
 .pin-key:hover { background: var(--surface2); border-color: var(--border2); }
 .pin-key:active { transform: scale(0.92); background: var(--surface2); }
 .pin-key.clear { font-size: 13px; font-weight: 500; color: var(--muted); font-family: var(--sans); letter-spacing: 0.02em; }
@@ -75,7 +75,7 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 .status-pill.in .status-dot { background: var(--accent); animation: blink 1.4s infinite; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
 .duration-counter { font-family: var(--mono); font-size: 17px; color: var(--accent); margin-bottom: 1.5rem; min-height: 26px; letter-spacing: 1px; }
-.btn-clock { width: 100%; padding: 18px; border-radius: var(--radius); font-size: 16px; font-weight: 700; letter-spacing: 0.3px; cursor: pointer; border: none; transition: all 0.15s; }
+.btn-clock { width: 100%; padding: 18px; border-radius: var(--radius); font-size: 16px; font-weight: 700; letter-spacing: 0.3px; cursor: pointer; border: none; transition: all 0.15s; touch-action: manipulation; }
 .btn-clock.clock-in { background: var(--accent); color: #fff; }
 .btn-clock.clock-in:active { opacity: 0.85; transform: scale(0.98); }
 .btn-clock.clock-out { background: var(--accent-dim); border: 1.5px solid var(--accent); color: var(--accent); }
@@ -223,19 +223,19 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
       <div class="pin-dot" id="dot-0"></div><div class="pin-dot" id="dot-1"></div>
       <div class="pin-dot" id="dot-2"></div><div class="pin-dot" id="dot-3"></div>
     </div>
-    <div class="pin-grid">
-      <button class="pin-key" onclick="pinKey('1')">1</button>
-      <button class="pin-key" onclick="pinKey('2')">2</button>
-      <button class="pin-key" onclick="pinKey('3')">3</button>
-      <button class="pin-key" onclick="pinKey('4')">4</button>
-      <button class="pin-key" onclick="pinKey('5')">5</button>
-      <button class="pin-key" onclick="pinKey('6')">6</button>
-      <button class="pin-key" onclick="pinKey('7')">7</button>
-      <button class="pin-key" onclick="pinKey('8')">8</button>
-      <button class="pin-key" onclick="pinKey('9')">9</button>
-      <button class="pin-key clear" onclick="clearPin()">Clear</button>
-      <button class="pin-key" onclick="pinKey('0')">0</button>
-      <button class="pin-key del" onclick="delPin()">⌫</button>
+    <div class="pin-grid" id="pin-grid">
+      <button class="pin-key" data-key="1">1</button>
+      <button class="pin-key" data-key="2">2</button>
+      <button class="pin-key" data-key="3">3</button>
+      <button class="pin-key" data-key="4">4</button>
+      <button class="pin-key" data-key="5">5</button>
+      <button class="pin-key" data-key="6">6</button>
+      <button class="pin-key" data-key="7">7</button>
+      <button class="pin-key" data-key="8">8</button>
+      <button class="pin-key" data-key="9">9</button>
+      <button class="pin-key clear" data-key="clear">Clear</button>
+      <button class="pin-key" data-key="0">0</button>
+      <button class="pin-key del" data-key="del">⌫</button>
     </div>
     <div class="pin-error" id="pin-error"></div>
   </div>
@@ -254,7 +254,7 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
       <div class="status-pill out" id="status-pill"><span class="status-dot"></span><span id="status-text">Clocked Out</span></div>
       <div class="duration-counter" id="duration-counter"></div>
     </div>
-    <button class="btn-clock clock-in" id="clock-btn" onclick="toggleClock()">Clock In</button>
+    <button class="btn-clock clock-in" id="clock-btn">Clock In</button>
     <div class="today-section">
       <div class="section-label">Today's entries</div>
       <div class="log-list" id="log-list"></div>
@@ -663,6 +663,58 @@ async function savePin(){
 }
 function openDelEmpModal(id,name){ closeAllModals(); editingEmpId=id; document.getElementById('del-emp-info').textContent=`Remove "${name}"? This permanently deletes their account and all time entries.`; document.getElementById('modal-del-emp').classList.add('open'); }
 async function confirmDelEmp(){ await fetch(`/api/employees/${editingEmpId}`,{method:'DELETE'}); closeAllModals(); await loadEmpFilter(); await loadEmpTable(); }
+
+// ── MOBILE TOUCH FIXES ──
+function setupTouchEvents() {
+  // PIN keys — use touchend to fire immediately without 300ms delay
+  const pinGrid = document.getElementById('pin-grid');
+  if (pinGrid) {
+    pinGrid.addEventListener('touchend', function(e) {
+      e.preventDefault(); // prevents the delayed click from also firing
+      const btn = e.target.closest('[data-key]');
+      if (!btn) return;
+      const key = btn.getAttribute('data-key');
+      if (key === 'clear') clearPin();
+      else if (key === 'del') delPin();
+      else pinKey(key);
+    }, { passive: false });
+    // Also handle regular click for desktop
+    pinGrid.addEventListener('click', function(e) {
+      const btn = e.target.closest('[data-key]');
+      if (!btn) return;
+      const key = btn.getAttribute('data-key');
+      if (key === 'clear') clearPin();
+      else if (key === 'del') delPin();
+      else pinKey(key);
+    });
+  }
+
+  // Clock button — bind both touchend and click robustly
+  function bindClockBtn() {
+    const btn = document.getElementById('clock-btn');
+    if (!btn) return;
+    let tapped = false;
+    btn.addEventListener('touchend', function(e) {
+      e.preventDefault();
+      if (tapped) return;
+      tapped = true;
+      setTimeout(() => { tapped = false; }, 800);
+      toggleClock();
+    }, { passive: false });
+    btn.addEventListener('click', function(e) {
+      if (tapped) return; // already handled by touchend
+      toggleClock();
+    });
+  }
+  bindClockBtn();
+  // Re-bind after status refresh since button state changes
+  const origRefresh = window.refreshStatus;
+  window.refreshStatus = async function() {
+    await origRefresh();
+    bindClockBtn();
+  };
+}
+document.addEventListener('DOMContentLoaded', setupTouchEvents);
 
 // ── HELPERS ──
 function closeAllModals(){ document.querySelectorAll('.modal-overlay').forEach(m=>m.classList.remove('open')); }
