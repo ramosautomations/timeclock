@@ -50,21 +50,21 @@ if (empCount.c === 0) {
 
   // Seed pay periods starting Jun 1 2026 going back
   const periodInsert = db.prepare('INSERT INTO pay_periods (start_date, end_date) VALUES (?, ?)');
-  periodInsert.run('2026-06-01', '2026-06-14');
-  periodInsert.run('2026-05-18', '2026-05-31');
-  periodInsert.run('2026-05-04', '2026-05-17');
-  periodInsert.run('2026-04-20', '2026-05-03');
+  periodInsert.run('2026-05-29', '2026-06-11');
+  periodInsert.run('2026-05-15', '2026-05-28');
+  periodInsert.run('2026-05-01', '2026-05-14');
+  periodInsert.run('2026-04-17', '2026-04-30');
 }
 
-// Generate pay periods dynamically (biweekly from anchor)
+// Generate pay periods dynamically (biweekly Fri-Thu, anchor: 2026-05-29)
 function getPayPeriods(count = 10) {
-  const anchor = new Date('2026-06-01');
+  const anchor = new Date('2026-05-29'); // Friday May 29 2026
   const periods = [];
   for (let i = 0; i < count; i++) {
     const start = new Date(anchor);
     start.setDate(anchor.getDate() - i * 14);
     const end = new Date(start);
-    end.setDate(start.getDate() + 13);
+    end.setDate(start.getDate() + 13); // 14 days: Fri to Thu
     periods.push({
       start: start.toISOString().slice(0, 10),
       end: end.toISOString().slice(0, 10)
@@ -254,3 +254,55 @@ app.get('/api/report', (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`TimeClock running on http://localhost:${PORT}`));
+// ---- ADMIN TIME ENTRY MANAGEMENT ----
+
+// Get all entries for an employee (admin)
+app.get('/api/entries/:employeeId', (req, res) => {
+  const { start, end } = req.query;
+  let sql = `SELECT * FROM time_entries WHERE employee_id = ?`;
+  const params = [req.params.employeeId];
+  if (start && end) { sql += ` AND date(clock_in) >= ? AND date(clock_in) <= ?`; params.push(start, end); }
+  sql += ` ORDER BY clock_in DESC`;
+  res.json(db.prepare(sql).all(...params));
+});
+
+// Add a manual time entry (admin)
+app.post('/api/entries', (req, res) => {
+  const { employee_id, clock_in, clock_out } = req.body;
+  if (!employee_id || !clock_in) return res.status(400).json({ error: 'employee_id and clock_in are required' });
+  if (clock_out && clock_out <= clock_in) return res.status(400).json({ error: 'Clock-out must be after clock-in' });
+  let regular_mins = 0, overtime_mins = 0;
+  if (clock_out) {
+    const totalMins = Math.round((new Date(clock_out) - new Date(clock_in)) / 60000);
+    regular_mins = Math.min(totalMins, 480);
+    overtime_mins = Math.max(0, totalMins - 480);
+  }
+  const result = db.prepare(`
+    INSERT INTO time_entries (employee_id, clock_in, clock_out, regular_mins, overtime_mins)
+    VALUES (?, ?, ?, ?, ?)
+  `).run(employee_id, clock_in, clock_out || null, regular_mins, overtime_mins);
+  res.json(db.prepare('SELECT * FROM time_entries WHERE id = ?').get(result.lastInsertRowid));
+});
+
+// Edit a time entry (admin)
+app.put('/api/entries/:id', (req, res) => {
+  const { clock_in, clock_out } = req.body;
+  if (!clock_in) return res.status(400).json({ error: 'clock_in is required' });
+  if (clock_out && clock_out <= clock_in) return res.status(400).json({ error: 'Clock-out must be after clock-in' });
+  let regular_mins = 0, overtime_mins = 0;
+  if (clock_out) {
+    const totalMins = Math.round((new Date(clock_out) - new Date(clock_in)) / 60000);
+    regular_mins = Math.min(totalMins, 480);
+    overtime_mins = Math.max(0, totalMins - 480);
+  }
+  db.prepare(`
+    UPDATE time_entries SET clock_in=?, clock_out=?, regular_mins=?, overtime_mins=? WHERE id=?
+  `).run(clock_in, clock_out || null, regular_mins, overtime_mins, req.params.id);
+  res.json(db.prepare('SELECT * FROM time_entries WHERE id=?').get(req.params.id));
+});
+
+// Delete a time entry (admin)
+app.delete('/api/entries/:id', (req, res) => {
+  db.prepare('DELETE FROM time_entries WHERE id=?').run(req.params.id);
+  res.json({ ok: true });
+});
