@@ -9,32 +9,23 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 :root {
-  --bg: #0f0f11;
-  --surface: #18181b;
-  --surface2: #222227;
-  --border: #2a2a31;
-  --border2: #3a3a44;
-  --text: #f1f1f3;
-  --muted: #71717a;
-  --accent: #ef4444;
-  --accent-dim: rgba(239,68,68,0.12);
-  --accent-dim2: rgba(239,68,68,0.22);
-  --amber: #f59e0b;
-  --amber-dim: rgba(245,158,11,0.12);
-  --blue: #3b82f6;
-  --blue-dim: rgba(59,130,246,0.12);
-  --radius: 14px;
-  --radius-sm: 10px;
-  --mono: 'DM Mono', monospace;
-  --sans: 'Inter', sans-serif;
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --bg: #0f0f11; --surface: #18181b; --surface2: #222227;
+  --border: #2a2a31; --border2: #3a3a44;
+  --text: #f1f1f3; --muted: #71717a;
+  --accent: #ef4444; --accent-dim: rgba(239,68,68,0.12); --accent-dim2: rgba(239,68,68,0.22);
+  --amber: #f59e0b; --amber-dim: rgba(245,158,11,0.15);
+  --blue: #3b82f6; --blue-dim: rgba(59,130,246,0.12);
+  --green: #22c55e; --green-dim: rgba(34,197,94,0.12);
+  --purple: #a855f7; --purple-dim: rgba(168,85,247,0.12);
+  --radius: 14px; --radius-sm: 10px;
+  --mono: 'DM Mono', monospace; --sans: 'Inter', sans-serif;
+  --safe-b: env(safe-area-inset-bottom, 0px);
 }
-html { height: 100%; }
-body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100%; overscroll-behavior: none; }
+html, body { height: 100%; }
+body { font-family: var(--sans); background: var(--bg); color: var(--text); overscroll-behavior: none; }
 .screen { display: none; min-height: 100dvh; flex-direction: column; }
 .screen.active { display: flex; }
 input, button, select { font-family: var(--sans); -webkit-appearance: none; appearance: none; }
-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 30px !important; }
 
 /* ── LOGIN ── */
 #screen-login { align-items: center; justify-content: center; padding: 1.5rem; }
@@ -42,148 +33,192 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 .brand { text-align: center; margin-bottom: 2rem; }
 .brand-icon { width: 60px; height: 60px; background: var(--accent-dim); border: 1.5px solid var(--accent); border-radius: 18px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
 .brand-icon svg { width: 28px; height: 28px; stroke: var(--accent); }
-.brand h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+.brand h1 { font-size: 24px; font-weight: 700; }
 .brand p { font-size: 14px; color: var(--muted); margin-top: 4px; }
 .pin-display { display: flex; gap: 12px; justify-content: center; margin-bottom: 2rem; }
-.pin-dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--border2); background: transparent; transition: all 0.18s; }
+.pin-dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--border2); transition: all 0.18s; }
 .pin-dot.filled { background: var(--accent); border-color: var(--accent); transform: scale(1.1); }
-.pin-dot.error { background: var(--accent); border-color: var(--accent); animation: shake 0.4s; }
+.pin-dot.error { background: var(--accent); border-color: var(--accent); animation: shake .4s; }
 @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
 .pin-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-.pin-key { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 20px 10px; font-size: 20px; font-weight: 600; font-family: var(--mono); cursor: pointer; transition: all 0.1s; color: var(--text); text-align: center; user-select: none; touch-action: manipulation; }
-.pin-key:hover { background: var(--surface2); border-color: var(--border2); }
-.pin-key:active { transform: scale(0.92); background: var(--surface2); }
-.pin-key.clear { font-size: 13px; font-weight: 500; color: var(--muted); font-family: var(--sans); letter-spacing: 0.02em; }
-.pin-key.del { font-size: 20px; color: var(--amber); font-family: var(--sans); }
+.pin-key { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 20px 10px; font-size: 20px; font-weight: 600; font-family: var(--mono); cursor: pointer; color: var(--text); text-align: center; user-select: none; touch-action: manipulation; transition: background 0.1s; }
+.pin-key:hover { background: var(--surface2); }
+.pin-key:active { background: var(--surface2); transform: scale(0.93); }
+.pin-key.clear { font-size: 13px; font-weight: 500; color: var(--muted); font-family: var(--sans); }
+.pin-key.del { font-size: 20px; color: var(--amber); }
 .pin-error { text-align: center; font-size: 13px; color: var(--accent); margin-top: 1rem; min-height: 20px; font-weight: 500; }
 
-/* ── EMPLOYEE ── */
+/* ── TOP BAR ── */
 .top-bar { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; border-bottom: 1.5px solid var(--border); background: var(--surface); flex-shrink: 0; }
 .top-bar-title { font-size: 15px; font-weight: 600; }
 .top-bar-title span { color: var(--muted); font-weight: 400; }
-.btn-sm { background: none; border: 1.5px solid var(--border); color: var(--muted); font-size: 12px; font-weight: 500; padding: 7px 14px; border-radius: 99px; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+.btn-sm { background: none; border: 1.5px solid var(--border); color: var(--muted); font-size: 12px; font-weight: 500; padding: 7px 14px; border-radius: 99px; cursor: pointer; touch-action: manipulation; }
 .btn-sm:hover { border-color: var(--border2); color: var(--text); }
-.emp-body { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 1.75rem 1.25rem calc(1.75rem + var(--safe-bottom)); max-width: 460px; margin: 0 auto; width: 100%; }
-.clock-hero { text-align: center; margin-bottom: 2rem; width: 100%; }
-.live-time { font-family: var(--mono); font-size: clamp(38px, 10vw, 56px); font-weight: 500; letter-spacing: 2px; line-height: 1; }
-.live-date { font-size: 13px; color: var(--muted); margin-top: 8px; }
-.status-pill { display: inline-flex; align-items: center; gap: 7px; padding: 7px 18px; border-radius: 99px; font-size: 13px; font-weight: 600; margin: 1.25rem 0 0.5rem; }
+
+/* ── EMPLOYEE BODY ── */
+.emp-body { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 1.5rem 1.25rem calc(1.5rem + var(--safe-b)); max-width: 460px; margin: 0 auto; width: 100%; }
+
+/* clock */
+.clock-hero { text-align: center; width: 100%; margin-bottom: 1.5rem; }
+.live-time { font-family: var(--mono); font-size: clamp(36px, 10vw, 52px); font-weight: 500; letter-spacing: 2px; line-height: 1; }
+.live-date { font-size: 13px; color: var(--muted); margin-top: 6px; }
+
+/* work type selector */
+.type-selector { width: 100%; margin-bottom: 1.25rem; }
+.type-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 10px; }
+.type-btns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.type-btn { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 12px 6px; font-size: 13px; font-weight: 500; color: var(--muted); cursor: pointer; text-align: center; touch-action: manipulation; transition: all 0.15s; line-height: 1.3; }
+.type-btn:active { transform: scale(0.96); }
+.type-btn.selected.type-class { background: var(--blue-dim); border-color: var(--blue); color: var(--blue); }
+.type-btn.selected.type-desk { background: var(--green-dim); border-color: var(--green); color: var(--green); }
+.type-btn.selected.type-private { background: var(--purple-dim); border-color: var(--purple); color: var(--purple); }
+
+/* status */
+.status-pill { display: inline-flex; align-items: center; gap: 7px; padding: 7px 18px; border-radius: 99px; font-size: 13px; font-weight: 600; margin-bottom: 0.5rem; }
 .status-pill.out { background: var(--surface2); border: 1.5px solid var(--border2); color: var(--muted); }
-.status-pill.in { background: var(--accent-dim); border: 1.5px solid var(--accent); color: var(--accent); }
+.status-pill.in { border: 1.5px solid; }
+.status-pill.in.type-class { background: var(--blue-dim); border-color: var(--blue); color: var(--blue); }
+.status-pill.in.type-desk { background: var(--green-dim); border-color: var(--green); color: var(--green); }
+.status-pill.in.type-private { background: var(--purple-dim); border-color: var(--purple); color: var(--purple); }
 .status-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
 .status-pill.out .status-dot { background: var(--muted); }
-.status-pill.in .status-dot { background: var(--accent); animation: blink 1.4s infinite; }
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-.duration-counter { font-family: var(--mono); font-size: 17px; color: var(--accent); margin-bottom: 1.5rem; min-height: 26px; letter-spacing: 1px; }
-.btn-clock { width: 100%; padding: 18px; border-radius: var(--radius); font-size: 16px; font-weight: 700; letter-spacing: 0.3px; cursor: pointer; border: none; transition: all 0.15s; touch-action: manipulation; }
+.status-pill.in .status-dot { background: currentColor; animation: blink 1.4s infinite; }
+@keyframes blink { 0%,100%{opacity:1}50%{opacity:0.3} }
+.duration-counter { font-family: var(--mono); font-size: 17px; color: var(--muted); margin-bottom: 1.25rem; min-height: 26px; letter-spacing: 1px; }
+
+/* clock button */
+.btn-clock { width: 100%; padding: 18px; border-radius: var(--radius); font-size: 16px; font-weight: 700; cursor: pointer; border: none; touch-action: manipulation; transition: opacity 0.15s, transform 0.1s; }
+.btn-clock:active { transform: scale(0.98); opacity: 0.85; }
 .btn-clock.clock-in { background: var(--accent); color: #fff; }
-.btn-clock.clock-in:active { opacity: 0.85; transform: scale(0.98); }
 .btn-clock.clock-out { background: var(--accent-dim); border: 1.5px solid var(--accent); color: var(--accent); }
-.btn-clock.clock-out:active { background: var(--accent-dim2); transform: scale(0.98); }
-.today-section { width: 100%; margin-top: 1.75rem; }
+.btn-clock:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* today log */
+.today-section { width: 100%; margin-top: 1.5rem; }
 .section-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 10px; }
 .log-list { display: flex; flex-direction: column; gap: 8px; }
-.log-item { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-.log-times { font-family: var(--mono); font-size: 13px; display: flex; align-items: center; flex-wrap: wrap; gap: 2px; }
+.log-item { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 11px 14px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.log-item-left { display: flex; flex-direction: column; gap: 3px; }
+.log-type-tag { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+.log-type-tag.type-class { color: var(--blue); }
+.log-type-tag.type-desk { color: var(--green); }
+.log-type-tag.type-private { color: var(--purple); }
+.log-times { font-family: var(--mono); font-size: 13px; display: flex; align-items: center; gap: 4px; }
 .log-in { color: var(--accent); }
-.log-arrow { color: var(--border2); margin: 0 4px; }
+.log-arrow { color: var(--border2); margin: 0 2px; }
 .log-out { color: var(--muted); }
 .log-dur { font-size: 12px; color: var(--muted); font-family: var(--mono); white-space: nowrap; }
 .log-dur.ot { color: var(--amber); }
 .empty-log { font-size: 13px; color: var(--muted); text-align: center; padding: 2rem 1rem; background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-sm); }
 
-/* ── ADMIN HEADER ── */
+/* ── ADMIN ── */
+#screen-admin { flex-direction: column; }
 .admin-header { background: var(--surface); border-bottom: 1.5px solid var(--border); flex-shrink: 0; }
 .admin-header-top { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; gap: 10px; }
-.admin-title { font-size: 16px; font-weight: 700; white-space: nowrap; }
+.admin-title { font-size: 16px; font-weight: 700; }
 .admin-nav { display: flex; border-top: 1.5px solid var(--border); }
-.nav-tab { flex: 1; background: none; border: none; border-bottom: 2.5px solid transparent; color: var(--muted); font-size: 13px; font-family: var(--sans); font-weight: 500; padding: 11px 8px; cursor: pointer; transition: all 0.15s; text-align: center; }
+.nav-tab { flex: 1; background: none; border: none; border-bottom: 2.5px solid transparent; color: var(--muted); font-size: 13px; font-family: var(--sans); font-weight: 500; padding: 11px 8px; cursor: pointer; touch-action: manipulation; text-align: center; transition: all 0.15s; }
 .nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-.nav-tab:hover:not(.active) { color: var(--text); }
-.admin-subbar { padding: 10px 1.25rem; border-top: 1.5px solid var(--border); display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-.admin-subbar select { background: var(--bg); border: 1.5px solid var(--border); color: var(--text); font-size: 13px; padding: 8px 30px 8px 12px; border-radius: var(--radius-sm); flex: 1; min-width: 0; cursor: pointer; }
-.btn-add { background: var(--accent-dim); border: 1.5px solid var(--accent); color: var(--accent); font-size: 13px; font-weight: 600; padding: 8px 16px; border-radius: var(--radius-sm); cursor: pointer; white-space: nowrap; }
-.btn-add:active { background: var(--accent-dim2); }
+.admin-subbar { padding: 10px 1.25rem; border-top: 1.5px solid var(--border); display: flex; gap: 8px; flex-wrap: wrap; }
+.admin-subbar select { background: var(--bg); border: 1.5px solid var(--border); color: var(--text); font-size: 13px; padding: 8px 28px 8px 10px; border-radius: var(--radius-sm); flex: 1; min-width: 120px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; }
+.btn-add { background: var(--accent-dim); border: 1.5px solid var(--accent); color: var(--accent); font-size: 13px; font-weight: 600; padding: 8px 16px; border-radius: var(--radius-sm); cursor: pointer; white-space: nowrap; touch-action: manipulation; }
+.admin-body { flex: 1; padding: 1.25rem; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: calc(1.25rem + var(--safe-b)); }
+.admin-panel { display: none; } .admin-panel.active { display: block; }
 
-/* ── ADMIN BODY ── */
-.admin-body { flex: 1; padding: 1.25rem; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: calc(1.25rem + var(--safe-bottom)); }
-.admin-panel { display: none; }
-.admin-panel.active { display: block; }
-
-/* ── METRICS ── */
+/* metrics */
 .metrics-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 1.25rem; }
-@media (min-width: 600px) { .metrics-row { grid-template-columns: repeat(4, 1fr); } }
-.metric-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 1rem 1.1rem; }
+@media(min-width:600px){ .metrics-row { grid-template-columns: repeat(4, 1fr); } }
+.metric-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 1rem; }
 .metric-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 6px; font-weight: 500; }
-.metric-val { font-size: 26px; font-weight: 700; font-family: var(--mono); line-height: 1; }
+.metric-val { font-size: 24px; font-weight: 700; font-family: var(--mono); line-height: 1; }
 .metric-val.red { color: var(--accent); } .metric-val.amber { color: var(--amber); } .metric-val.blue { color: var(--blue); }
 .metric-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
 
-/* ── REPORT TABLE (desktop) ── */
-.card-table { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 1.25rem; }
-.desktop-table { display: none; }
-@media (min-width: 700px) { .desktop-table { display: table; width: 100%; border-collapse: collapse; font-size: 13px; } }
-.desktop-table thead th { text-align: left; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); padding: 11px 16px; border-bottom: 1.5px solid var(--border); background: var(--surface2); white-space: nowrap; }
-.desktop-table tbody td { padding: 13px 16px; border-bottom: 1.5px solid var(--border); vertical-align: middle; }
-.desktop-table tbody tr:last-child td { border-bottom: none; }
-.desktop-table tbody tr.data-row:hover td { background: var(--surface2); }
+/* type breakdown strip */
+.type-breakdown { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.25rem; }
+.type-chip { display: flex; flex-direction: column; align-items: center; background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 10px 16px; flex: 1; min-width: 90px; }
+.type-chip-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+.type-chip-val { font-family: var(--mono); font-size: 18px; font-weight: 700; }
+.type-chip.tc-class { border-color: var(--blue); }
+.type-chip.tc-class .type-chip-label { color: var(--blue); }
+.type-chip.tc-desk { border-color: var(--green); }
+.type-chip.tc-desk .type-chip-label { color: var(--green); }
+.type-chip.tc-private { border-color: var(--purple); }
+.type-chip.tc-private .type-chip-label { color: var(--purple); }
 
-/* ── REPORT CARDS (mobile) ── */
-.mobile-cards { display: flex; flex-direction: column; gap: 0; }
-@media (min-width: 700px) { .mobile-cards { display: none; } }
+/* card table */
+.card-table { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 1.25rem; }
+
+/* report cards mobile */
 .report-card { padding: 14px 16px; border-bottom: 1.5px solid var(--border); }
 .report-card:last-child { border-bottom: none; }
-.report-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-.report-card-name { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 14px; }
-.report-card-hrs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; }
-.report-card-stat { text-align: center; background: var(--surface2); border-radius: 8px; padding: 8px 4px; }
-.report-card-stat .slabel { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 3px; }
-.report-card-stat .sval { font-family: var(--mono); font-size: 14px; font-weight: 600; }
-.report-card-stat .sval.ot { color: var(--amber); }
-.report-card-actions { display: flex; gap: 8px; }
+.report-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; gap: 8px; }
+.report-card-name { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 14px; min-width: 0; }
+.report-card-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.hours-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 10px; }
+@media(min-width:400px){ .hours-grid { grid-template-columns: repeat(4, 1fr); } }
+.hours-grid.six { grid-template-columns: repeat(3, 1fr); }
+@media(min-width:450px){ .hours-grid.six { grid-template-columns: repeat(6, 1fr); } }
+.hstat { text-align: center; background: var(--surface2); border-radius: 8px; padding: 8px 4px; }
+.hstat .hl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 3px; font-weight: 500; }
+.hstat .hv { font-family: var(--mono); font-size: 13px; font-weight: 600; display: block; }
+.hstat.hv-blue .hv { color: var(--blue); }
+.hstat.hv-green .hv { color: var(--green); }
+.hstat.hv-purple .hv { color: var(--purple); }
+.hstat.hv-amber .hv { color: var(--amber); }
 
-/* ── DETAIL EXPAND ── */
-.detail-section { display: none; padding: 0 0 4px; }
+/* detail expand */
+.detail-section { display: none; border-top: 1.5px solid var(--border); }
 .detail-section.open { display: block; }
-.detail-entry-card { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-top: 1.5px solid var(--border); gap: 8px; }
-.detail-entry-card:first-child { border-top: 1.5px solid var(--border); }
-.de-left { display: flex; flex-direction: column; gap: 3px; }
+.detail-entry-card { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 1.5px solid var(--border); gap: 8px; }
+.detail-entry-card:last-child { border-bottom: none; }
+.de-left { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.de-meta { display: flex; align-items: center; gap: 8px; }
 .de-date { font-size: 11px; color: var(--muted); font-weight: 500; }
+.de-badge { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; padding: 1px 7px; border-radius: 99px; }
+.de-badge.type-class { background: var(--blue-dim); color: var(--blue); }
+.de-badge.type-desk { background: var(--green-dim); color: var(--green); }
+.de-badge.type-private { background: var(--purple-dim); color: var(--purple); }
 .de-times { font-family: var(--mono); font-size: 13px; display: flex; align-items: center; gap: 4px; }
 .de-in { color: var(--accent); } .de-out { color: var(--muted); }
 .de-dur { font-family: var(--mono); font-size: 12px; color: var(--text); white-space: nowrap; }
 .de-actions { display: flex; gap: 6px; flex-shrink: 0; }
 
-/* ── EMPLOYEE TABLE ── */
+/* desktop table */
+.dtable { display: none; width: 100%; border-collapse: collapse; font-size: 13px; }
+@media(min-width:700px){ .dtable { display: table; } .mobile-only { display: none !important; } }
+.dtable thead th { text-align: left; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); padding: 11px 14px; border-bottom: 1.5px solid var(--border); background: var(--surface2); white-space: nowrap; }
+.dtable tbody td { padding: 12px 14px; border-bottom: 1.5px solid var(--border); vertical-align: middle; }
+.dtable tbody tr.data-row:last-child td { border-bottom: none; }
+.dtable tbody tr.data-row:hover td { background: var(--surface2); }
+.dtable .detail-row { display: none; } .dtable .detail-row.open { display: table-row; }
+
+/* employee mgmt cards */
 .emp-card { padding: 14px 16px; border-bottom: 1.5px solid var(--border); display: flex; align-items: center; gap: 12px; }
 .emp-card:last-child { border-bottom: none; }
 .emp-card-info { flex: 1; min-width: 0; }
 .emp-card-name { font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .emp-card-role { font-size: 12px; color: var(--muted); margin-top: 2px; }
-.emp-card-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.emp-card-actions { display: flex; gap: 6px; }
 
-/* ── SHARED ── */
+/* shared */
 .emp-avatar { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; background: var(--accent-dim); color: var(--accent); font-size: 11px; font-weight: 700; flex-shrink: 0; }
-.badge-admin { background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent); font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 99px; white-space: nowrap; }
-.hrs-cell { font-family: var(--mono); font-weight: 500; }
-.ot-cell { font-family: var(--mono); color: var(--amber); font-weight: 500; }
-.toggle-btn { background: none; border: 1.5px solid var(--border); color: var(--muted); font-size: 11px; font-weight: 500; padding: 5px 12px; border-radius: 99px; cursor: pointer; white-space: nowrap; }
+.badge-admin { background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent); font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 99px; }
+.toggle-btn, .action-btn { background: none; border: 1.5px solid var(--border); color: var(--muted); font-size: 11px; font-weight: 500; padding: 5px 12px; border-radius: 99px; cursor: pointer; white-space: nowrap; touch-action: manipulation; transition: all 0.12s; }
 .toggle-btn:hover { border-color: var(--border2); color: var(--text); }
-.action-btn { background: none; border: 1.5px solid var(--border); color: var(--muted); font-size: 11px; font-weight: 500; padding: 5px 11px; border-radius: 99px; cursor: pointer; transition: all 0.12s; white-space: nowrap; }
-.action-btn:hover { border-color: var(--border2); color: var(--text); }
-.action-btn.edit:hover,.action-btn.edit:active { border-color: var(--blue); color: var(--blue); }
-.action-btn.del:hover,.action-btn.del:active { border-color: var(--accent); color: var(--accent); }
-.action-btn.pin:hover,.action-btn.pin:active { border-color: var(--amber); color: var(--amber); }
-.action-btn.add:hover,.action-btn.add:active { border-color: var(--accent); color: var(--accent); }
+.action-btn.edit:hover { border-color: var(--blue); color: var(--blue); }
+.action-btn.del:hover { border-color: var(--accent); color: var(--accent); }
+.action-btn.pin:hover { border-color: var(--amber); color: var(--amber); }
+.action-btn.add:hover { border-color: var(--accent); color: var(--accent); }
 
-/* ── MODAL ── */
-.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 200; align-items: flex-end; justify-content: center; padding: 0; }
-@media (min-width: 500px) { .modal-overlay { align-items: center; padding: 1rem; } }
+/* modal */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 200; align-items: flex-end; justify-content: center; }
+@media(min-width:500px){ .modal-overlay { align-items: center; padding: 1rem; } }
 .modal-overlay.open { display: flex; }
-.modal { background: var(--surface); border: 1.5px solid var(--border2); border-radius: var(--radius) var(--radius) 0 0; padding: 1.5rem; width: 100%; max-width: 420px; padding-bottom: calc(1.5rem + var(--safe-bottom)); }
-@media (min-width: 500px) { .modal { border-radius: var(--radius); padding-bottom: 1.5rem; } }
+.modal { background: var(--surface); border: 1.5px solid var(--border2); border-radius: var(--radius) var(--radius) 0 0; padding: 1.5rem; width: 100%; max-width: 420px; padding-bottom: calc(1.5rem + var(--safe-b)); }
+@media(min-width:500px){ .modal { border-radius: var(--radius); padding-bottom: 1.5rem; } }
 .modal-handle { width: 36px; height: 4px; background: var(--border2); border-radius: 99px; margin: 0 auto 1.25rem; display: block; }
-@media (min-width: 500px) { .modal-handle { display: none; } }
+@media(min-width:500px){ .modal-handle { display: none; } }
 .modal h2 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
 .modal-sub { font-size: 13px; color: var(--muted); margin-bottom: 1.25rem; }
 .modal-field { margin-bottom: 1rem; }
@@ -195,13 +230,12 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 .modal-check { display: flex; align-items: center; gap: 10px; font-size: 14px; margin-bottom: 1.25rem; }
 .modal-check input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--accent); }
 .modal-actions { display: flex; gap: 10px; margin-top: 1.25rem; }
-.btn-primary { flex: 1; background: var(--accent); color: #fff; font-weight: 700; border: none; padding: 13px; border-radius: var(--radius-sm); cursor: pointer; font-size: 15px; }
+.btn-primary { flex: 1; background: var(--accent); color: #fff; font-weight: 700; border: none; padding: 13px; border-radius: var(--radius-sm); cursor: pointer; font-size: 15px; touch-action: manipulation; }
 .btn-primary:active { opacity: 0.85; }
 .btn-primary.danger { background: #b91c1c; }
-.btn-cancel { flex: 1; background: none; border: 1.5px solid var(--border2); color: var(--muted); padding: 13px; border-radius: var(--radius-sm); cursor: pointer; font-size: 15px; }
+.btn-cancel { flex: 1; background: none; border: 1.5px solid var(--border2); color: var(--muted); padding: 13px; border-radius: var(--radius-sm); cursor: pointer; font-size: 15px; touch-action: manipulation; }
 .modal-msg { font-size: 13px; margin-bottom: 0.75rem; min-height: 18px; font-weight: 500; }
-.modal-msg.error { color: var(--accent); }
-.modal-msg.success { color: #4ade80; }
+.modal-msg.error { color: var(--accent); } .modal-msg.success { color: #4ade80; }
 .modal-info { font-size: 13px; color: var(--muted); margin-bottom: 1.25rem; line-height: 1.6; background: var(--surface2); padding: 12px 14px; border-radius: var(--radius-sm); border: 1.5px solid var(--border); }
 </style>
 </head>
@@ -211,31 +245,18 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 <div id="screen-login" class="screen active">
   <div class="login-box">
     <div class="brand">
-      <div class="brand-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-        </svg>
-      </div>
-      <h1>TimeClock</h1>
-      <p>Enter your PIN to continue</p>
+      <div class="brand-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+      <h1>TimeClock</h1><p>Enter your PIN to continue</p>
     </div>
     <div class="pin-display">
       <div class="pin-dot" id="dot-0"></div><div class="pin-dot" id="dot-1"></div>
       <div class="pin-dot" id="dot-2"></div><div class="pin-dot" id="dot-3"></div>
     </div>
     <div class="pin-grid" id="pin-grid">
-      <button class="pin-key" data-key="1">1</button>
-      <button class="pin-key" data-key="2">2</button>
-      <button class="pin-key" data-key="3">3</button>
-      <button class="pin-key" data-key="4">4</button>
-      <button class="pin-key" data-key="5">5</button>
-      <button class="pin-key" data-key="6">6</button>
-      <button class="pin-key" data-key="7">7</button>
-      <button class="pin-key" data-key="8">8</button>
-      <button class="pin-key" data-key="9">9</button>
-      <button class="pin-key clear" data-key="clear">Clear</button>
-      <button class="pin-key" data-key="0">0</button>
-      <button class="pin-key del" data-key="del">⌫</button>
+      <button class="pin-key" data-key="1">1</button><button class="pin-key" data-key="2">2</button><button class="pin-key" data-key="3">3</button>
+      <button class="pin-key" data-key="4">4</button><button class="pin-key" data-key="5">5</button><button class="pin-key" data-key="6">6</button>
+      <button class="pin-key" data-key="7">7</button><button class="pin-key" data-key="8">8</button><button class="pin-key" data-key="9">9</button>
+      <button class="pin-key clear" data-key="clear">Clear</button><button class="pin-key" data-key="0">0</button><button class="pin-key del" data-key="del">⌫</button>
     </div>
     <div class="pin-error" id="pin-error"></div>
   </div>
@@ -251,10 +272,23 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
     <div class="clock-hero">
       <div class="live-time" id="live-time">00:00:00</div>
       <div class="live-date" id="live-date"></div>
-      <div class="status-pill out" id="status-pill"><span class="status-dot"></span><span id="status-text">Clocked Out</span></div>
-      <div class="duration-counter" id="duration-counter"></div>
     </div>
-    <button class="btn-clock clock-in" id="clock-btn" onclick="toggleClock()">Clock In</button>
+
+    <!-- Work type selector (shown when clocked out) -->
+    <div class="type-selector" id="type-selector">
+      <div class="type-label">Select work type</div>
+      <div class="type-btns">
+        <button class="type-btn type-class" data-type="Class" onclick="selectType('Class')">Class</button>
+        <button class="type-btn type-desk" data-type="Front Desk" onclick="selectType('Front Desk')">Front Desk</button>
+        <button class="type-btn type-private" data-type="Private Class" onclick="selectType('Private Class')">Private Class</button>
+      </div>
+    </div>
+
+    <div class="status-pill out" id="status-pill"><span class="status-dot"></span><span id="status-text">Clocked Out</span></div>
+    <div class="duration-counter" id="duration-counter"></div>
+
+    <button class="btn-clock clock-in" id="clock-btn" onclick="toggleClock()">Select a work type</button>
+
     <div class="today-section">
       <div class="section-label">Today's entries</div>
       <div class="log-list" id="log-list"></div>
@@ -282,34 +316,25 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
     </div>
   </div>
   <div class="admin-body">
-    <!-- REPORTS TAB -->
     <div class="admin-panel active" id="panel-reports">
       <div class="metrics-row" id="metrics-row"></div>
-      <!-- Mobile cards -->
-      <div class="card-table mobile-cards" id="report-mobile"></div>
-      <!-- Desktop table -->
-      <div class="card-table" style="display:none" id="report-desktop-wrap">
-        <table class="desktop-table" id="report-desktop">
-          <thead><tr><th>Employee</th><th>Days</th><th>Regular</th><th>Overtime</th><th>Total</th><th></th></tr></thead>
-          <tbody id="report-tbody"></tbody>
-        </table>
-        <div id="report-desktop-details"></div>
-      </div>
+      <div class="type-breakdown" id="type-breakdown"></div>
+      <div class="card-table" id="report-cards"></div>
     </div>
-    <!-- EMPLOYEES TAB -->
     <div class="admin-panel" id="panel-employees">
       <div class="card-table" id="emp-list"></div>
     </div>
   </div>
 </div>
 
-<!-- MODAL: ADD ENTRY -->
+<!-- MODALS -->
 <div class="modal-overlay" id="modal-add-entry">
-  <div class="modal">
-    <span class="modal-handle"></span>
-    <h2>Add Time Entry</h2>
-    <div class="modal-sub" id="add-entry-sub"></div>
+  <div class="modal"><span class="modal-handle"></span>
+    <h2>Add Time Entry</h2><div class="modal-sub" id="add-entry-sub"></div>
     <div class="modal-msg error" id="add-entry-err"></div>
+    <div class="modal-field"><label>Work Type</label>
+      <select id="ae-type"><option value="Class">Class</option><option value="Front Desk">Front Desk</option><option value="Private Class">Private Class</option></select>
+    </div>
     <div class="modal-field"><label>Date</label><input type="date" id="ae-date"/></div>
     <div class="modal-row">
       <div class="modal-field"><label>Clock In</label><input type="time" id="ae-in" step="60"/></div>
@@ -322,13 +347,13 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
   </div>
 </div>
 
-<!-- MODAL: EDIT ENTRY -->
 <div class="modal-overlay" id="modal-edit-entry">
-  <div class="modal">
-    <span class="modal-handle"></span>
-    <h2>Edit Entry</h2>
-    <div class="modal-sub" id="edit-entry-sub"></div>
+  <div class="modal"><span class="modal-handle"></span>
+    <h2>Edit Entry</h2><div class="modal-sub" id="edit-entry-sub"></div>
     <div class="modal-msg error" id="edit-entry-err"></div>
+    <div class="modal-field"><label>Work Type</label>
+      <select id="ee-type"><option value="Class">Class</option><option value="Front Desk">Front Desk</option><option value="Private Class">Private Class</option></select>
+    </div>
     <div class="modal-field"><label>Date</label><input type="date" id="ee-date"/></div>
     <div class="modal-row">
       <div class="modal-field"><label>Clock In</label><input type="time" id="ee-in" step="60"/></div>
@@ -341,12 +366,9 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
   </div>
 </div>
 
-<!-- MODAL: DELETE ENTRY -->
 <div class="modal-overlay" id="modal-del-entry">
-  <div class="modal">
-    <span class="modal-handle"></span>
-    <h2>Delete Entry</h2>
-    <div class="modal-info" id="del-entry-info"></div>
+  <div class="modal"><span class="modal-handle"></span>
+    <h2>Delete Entry</h2><div class="modal-info" id="del-entry-info"></div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeAllModals()">Cancel</button>
       <button class="btn-primary danger" onclick="confirmDelEntry()">Delete</button>
@@ -354,12 +376,9 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
   </div>
 </div>
 
-<!-- MODAL: ADD EMPLOYEE -->
 <div class="modal-overlay" id="modal-add-emp">
-  <div class="modal">
-    <span class="modal-handle"></span>
-    <h2>Add Employee</h2>
-    <div class="modal-msg error" id="add-emp-err"></div>
+  <div class="modal"><span class="modal-handle"></span>
+    <h2>Add Employee</h2><div class="modal-msg error" id="add-emp-err"></div>
     <div class="modal-field"><label>Full name</label><input id="new-name" type="text" placeholder="Jane Smith"/></div>
     <div class="modal-field"><label>PIN (4–8 digits)</label><input id="new-pin" type="password" placeholder="••••" maxlength="8" inputmode="numeric"/></div>
     <div class="modal-check"><input type="checkbox" id="new-admin"/><label for="new-admin">Admin access</label></div>
@@ -370,13 +389,10 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
   </div>
 </div>
 
-<!-- MODAL: EDIT EMPLOYEE -->
 <div class="modal-overlay" id="modal-edit-emp">
-  <div class="modal">
-    <span class="modal-handle"></span>
+  <div class="modal"><span class="modal-handle"></span>
     <h2>Edit Employee</h2>
-    <div class="modal-msg error" id="edit-emp-err"></div>
-    <div class="modal-msg success" id="edit-emp-ok"></div>
+    <div class="modal-msg error" id="edit-emp-err"></div><div class="modal-msg success" id="edit-emp-ok"></div>
     <div class="modal-field"><label>Full name</label><input id="edit-emp-name" type="text"/></div>
     <div class="modal-check"><input type="checkbox" id="edit-emp-admin"/><label for="edit-emp-admin">Admin access</label></div>
     <div class="modal-actions">
@@ -386,13 +402,10 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
   </div>
 </div>
 
-<!-- MODAL: RESET PIN -->
 <div class="modal-overlay" id="modal-pin">
-  <div class="modal">
-    <span class="modal-handle"></span>
+  <div class="modal"><span class="modal-handle"></span>
     <h2>Reset PIN</h2>
-    <div class="modal-msg error" id="pin-err"></div>
-    <div class="modal-msg success" id="pin-ok"></div>
+    <div class="modal-msg error" id="pin-err"></div><div class="modal-msg success" id="pin-ok"></div>
     <div class="modal-info" id="pin-info"></div>
     <div class="modal-field"><label>New PIN</label><input id="reset-pin" type="password" placeholder="••••" maxlength="8" inputmode="numeric"/></div>
     <div class="modal-field"><label>Confirm PIN</label><input id="reset-pin2" type="password" placeholder="••••" maxlength="8" inputmode="numeric"/></div>
@@ -403,12 +416,9 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
   </div>
 </div>
 
-<!-- MODAL: DELETE EMPLOYEE -->
 <div class="modal-overlay" id="modal-del-emp">
-  <div class="modal">
-    <span class="modal-handle"></span>
-    <h2>Remove Employee</h2>
-    <div class="modal-info" id="del-emp-info"></div>
+  <div class="modal"><span class="modal-handle"></span>
+    <h2>Remove Employee</h2><div class="modal-info" id="del-emp-info"></div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeAllModals()">Cancel</button>
       <button class="btn-primary danger" onclick="confirmDelEmp()">Remove</button>
@@ -417,38 +427,95 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 </div>
 
 <script>
-let currentUser=null,pinBuffer='',clockedIn=false,clockInTime=null;
-let durationTimer=null,clockTick=null,editingEmpId=null,editingEntryId=null,addEntryEmpId=null;
+const WORK_TYPES = ['Class', 'Front Desk', 'Private Class'];
+const TYPE_CLASS = { 'Class':'type-class','Front Desk':'type-desk','Private Class':'type-private' };
+const TYPE_HSTAT = { 'Class':'hv-blue','Front Desk':'hv-green','Private Class':'hv-purple' };
+const TYPE_BADGE = { 'Class':'type-class','Front Desk':'type-desk','Private Class':'type-private' };
+const TC_CHIP = { 'Class':'tc-class','Front Desk':'tc-desk','Private Class':'tc-private' };
+
+let currentUser=null, pinBuffer='', clockedIn=false, clockInTime=null, selectedType=null;
+let durationTimer=null, clockTick=null, editingEmpId=null, editingEntryId=null, addEntryEmpId=null;
 let reportData=[], currentPeriod='';
 
 // ── PIN ──
+function setupPin(){
+  const grid=document.getElementById('pin-grid');
+  const handle=e=>{
+    const btn=e.target.closest('[data-key]'); if(!btn)return;
+    if(e.type==='touchend') e.preventDefault();
+    const k=btn.getAttribute('data-key');
+    if(k==='clear') clearPin(); else if(k==='del') delPin(); else pinKey(k);
+  };
+  grid.addEventListener('touchend', handle, {passive:false});
+  grid.addEventListener('click', handle);
+}
 function pinKey(d){ if(pinBuffer.length>=8)return; pinBuffer+=d; updateDots(); if(pinBuffer.length>=4)tryLogin(); }
-function delPin(){ pinBuffer=pinBuffer.slice(0,-1); updateDots(); clearPinErr(); }
-function clearPin(){ pinBuffer=''; updateDots(); clearPinErr(); }
-function clearPinErr(){ document.getElementById('pin-error').textContent=''; }
+function delPin(){ pinBuffer=pinBuffer.slice(0,-1); updateDots(); document.getElementById('pin-error').textContent=''; }
+function clearPin(){ pinBuffer=''; updateDots(); document.getElementById('pin-error').textContent=''; }
 function updateDots(){ [0,1,2,3].forEach(i=>{ const d=document.getElementById('dot-'+i); d.classList.toggle('filled',i<pinBuffer.length); d.classList.remove('error'); }); }
 async function tryLogin(){
   try{
     const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pin:pinBuffer})});
-    if(!r.ok){ [0,1,2,3].forEach(i=>document.getElementById('dot-'+i).classList.add('error')); document.getElementById('pin-error').textContent='Invalid PIN.'; setTimeout(()=>{pinBuffer='';updateDots();clearPinErr();},1000); return; }
+    if(!r.ok){ [0,1,2,3].forEach(i=>document.getElementById('dot-'+i).classList.add('error')); document.getElementById('pin-error').textContent='Invalid PIN.'; setTimeout(()=>{pinBuffer='';updateDots();document.getElementById('pin-error').textContent='';},1000); return; }
     const u=await r.json(); currentUser=u; pinBuffer=''; updateDots();
     if(u.is_admin) showAdmin(); else showEmployee();
   }catch(e){ document.getElementById('pin-error').textContent='Connection error.'; pinBuffer=''; updateDots(); }
 }
-function logout(){ currentUser=null; pinBuffer=''; updateDots(); if(durationTimer)clearInterval(durationTimer); if(clockTick)clearInterval(clockTick); showScreen('login'); }
+function logout(){ currentUser=null; selectedType=null; pinBuffer=''; updateDots(); if(durationTimer)clearInterval(durationTimer); if(clockTick)clearInterval(clockTick); showScreen('login'); }
 
 // ── EMPLOYEE ──
-async function showEmployee(){ showScreen('employee'); document.getElementById('emp-name-display').textContent=currentUser.name; startClock(); await refreshStatus(); await loadTodayLog(); }
+async function showEmployee(){
+  showScreen('employee');
+  document.getElementById('emp-name-display').textContent=currentUser.name;
+  selectedType=null; updateTypeUI();
+  startClock(); await refreshStatus(); await loadTodayLog();
+}
 function startClock(){
   if(clockTick)clearInterval(clockTick);
   const tick=()=>{ const n=new Date(); document.getElementById('live-time').textContent=n.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'}); document.getElementById('live-date').textContent=n.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}); };
   tick(); clockTick=setInterval(tick,1000);
 }
+function selectType(t){
+  if(clockedIn) return; // can't change while clocked in
+  selectedType=t; updateTypeUI();
+}
+function updateTypeUI(){
+  // type buttons
+  document.querySelectorAll('.type-btn').forEach(b=>{
+    b.classList.remove('selected');
+    if(b.getAttribute('data-type')===selectedType) b.classList.add('selected');
+  });
+  // clock button state
+  const btn=document.getElementById('clock-btn');
+  if(clockedIn){
+    btn.textContent='Clock Out'; btn.className='btn-clock clock-out'; btn.disabled=false;
+    document.getElementById('type-selector').style.display='none';
+  } else {
+    document.getElementById('type-selector').style.display='block';
+    if(selectedType){
+      btn.textContent=`Clock In — ${selectedType}`; btn.className='btn-clock clock-in'; btn.disabled=false;
+    } else {
+      btn.textContent='Select a work type above'; btn.className='btn-clock clock-in'; btn.disabled=true;
+    }
+  }
+}
 async function refreshStatus(){
   const r=await fetch('/api/status/'+currentUser.id); const d=await r.json(); clockedIn=d.clocked_in;
-  const btn=document.getElementById('clock-btn'),pill=document.getElementById('status-pill');
-  if(clockedIn){ clockInTime=new Date(d.entry.clock_in); btn.textContent='Clock Out'; btn.className='btn-clock clock-out'; pill.className='status-pill in'; document.getElementById('status-text').textContent='Clocked In'; startDur(); }
-  else{ clockInTime=null; btn.textContent='Clock In'; btn.className='btn-clock clock-in'; pill.className='status-pill out'; document.getElementById('status-text').textContent='Clocked Out'; document.getElementById('duration-counter').textContent=''; if(durationTimer)clearInterval(durationTimer); }
+  const pill=document.getElementById('status-pill');
+  if(clockedIn){
+    clockInTime=new Date(d.entry.clock_in);
+    const t=d.entry.work_type||'Class';
+    pill.className='status-pill in '+TYPE_CLASS[t];
+    document.getElementById('status-text').textContent='Clocked In — '+t;
+    startDur();
+  } else {
+    clockInTime=null;
+    pill.className='status-pill out';
+    document.getElementById('status-text').textContent='Clocked Out';
+    document.getElementById('duration-counter').textContent='';
+    if(durationTimer)clearInterval(durationTimer);
+  }
+  updateTypeUI();
 }
 function startDur(){
   if(durationTimer)clearInterval(durationTimer);
@@ -457,28 +524,34 @@ function startDur(){
 }
 function pad(n){ return n.toString().padStart(2,'0'); }
 async function toggleClock(){
-  const btn = document.getElementById('clock-btn');
-  if (btn.disabled) return;
-  btn.disabled = true;
-  btn.style.opacity = '0.6';
-  try {
-    const res = await fetch(clockedIn?'/api/clockout':'/api/clockin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({employee_id:currentUser.id})});
-    if (!res.ok) { const e = await res.json(); alert(e.error || 'Error'); return; }
-    await refreshStatus();
-    await loadTodayLog();
-  } catch(e) {
-    alert('Network error. Please try again.');
-  } finally {
-    btn.disabled = false;
-    btn.style.opacity = '';
-  }
+  const btn=document.getElementById('clock-btn');
+  if(btn.disabled) return;
+  if(!clockedIn && !selectedType){ alert('Please select a work type first.'); return; }
+  btn.disabled=true; btn.style.opacity='0.6';
+  try{
+    const body=clockedIn?{employee_id:currentUser.id}:{employee_id:currentUser.id,work_type:selectedType};
+    const res=await fetch(clockedIn?'/api/clockout':'/api/clockin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    if(!res.ok){ const e=await res.json(); alert(e.error||'Error'); return; }
+    if(!clockedIn) selectedType=null; // reset after clock-in
+    await refreshStatus(); await loadTodayLog();
+  }catch(e){ alert('Network error. Please try again.'); }
+  finally{ btn.disabled=false; btn.style.opacity=''; }
 }
 async function loadTodayLog(){
   const r=await fetch('/api/today/'+currentUser.id); const entries=await r.json();
   const list=document.getElementById('log-list');
   if(!entries.length){ list.innerHTML='<div class="empty-log">No entries yet today</div>'; return; }
-  list.innerHTML=entries.map(e=>{ const inT=fmtTime(e.clock_in); const outT=e.clock_out?fmtTime(e.clock_out):null; const mins=e.clock_out?Math.round((new Date(e.clock_out)-new Date(e.clock_in))/60000):null;
-    return `<div class="log-item"><div class="log-times"><span class="log-in">${inT}</span>${outT?`<span class="log-arrow">→</span><span class="log-out">${outT}</span>`:'<span class="log-arrow"> ongoing…</span>'}</div>${mins?`<div class="log-dur ${e.overtime_mins>0?'ot':''}">${fmtDur(mins)}${e.overtime_mins>0?' ⚡':''}</div>`:''}</div>`;
+  list.innerHTML=entries.map(e=>{
+    const inT=fmtTime(e.clock_in); const outT=e.clock_out?fmtTime(e.clock_out):null;
+    const mins=e.clock_out?Math.round((new Date(e.clock_out)-new Date(e.clock_in))/60000):null;
+    const t=e.work_type||'Class';
+    return `<div class="log-item">
+      <div class="log-item-left">
+        <span class="log-type-tag ${TYPE_CLASS[t]}">${t}</span>
+        <div class="log-times"><span class="log-in">${inT}</span>${outT?`<span class="log-arrow">→</span><span class="log-out">${outT}</span>`:'<span class="log-arrow"> ongoing…</span>'}</div>
+      </div>
+      ${mins?`<div class="log-dur ${e.overtime_mins>0?'ot':''}">${fmtDur(mins)}${e.overtime_mins>0?' ⚡':''}</div>`:''}
+    </div>`;
   }).join('');
 }
 
@@ -508,135 +581,116 @@ async function loadReport(){
   const [start,end]=val.split('|'); const ef=document.getElementById('emp-filter').value;
   let url=`/api/report?start=${start}&end=${end}`; if(ef) url+=`&employee_id=${ef}`;
   const r=await fetch(url); reportData=await r.json();
-  let tReg=0,tOT=0,tAll=0; reportData.forEach(r=>{tReg+=r.totalRegular;tOT+=r.totalOvertime;tAll+=r.totalMins;});
+
+  let tReg=0,tOT=0,tAll=0; const totByType={};
+  WORK_TYPES.forEach(t=>totByType[t]=0);
+  reportData.forEach(row=>{
+    tReg+=row.totalRegular; tOT+=row.totalOvertime; tAll+=row.totalMins;
+    WORK_TYPES.forEach(t=>{ totByType[t]+=(row.byType[t]||0); });
+  });
+
   document.getElementById('metrics-row').innerHTML=`
     <div class="metric-card"><div class="metric-label">Regular hrs</div><div class="metric-val red">${(tReg/60).toFixed(1)}</div><div class="metric-sub">this period</div></div>
     <div class="metric-card"><div class="metric-label">Overtime hrs</div><div class="metric-val amber">${(tOT/60).toFixed(1)}</div><div class="metric-sub">&gt;8h/day · &gt;40h/wk</div></div>
     <div class="metric-card"><div class="metric-label">Total hrs</div><div class="metric-val blue">${(tAll/60).toFixed(1)}</div><div class="metric-sub">all employees</div></div>
     <div class="metric-card"><div class="metric-label">Employees</div><div class="metric-val">${reportData.filter(r=>r.totalMins>0).length}</div><div class="metric-sub">with entries</div></div>`;
-  renderMobileReport();
-  renderDesktopReport();
-}
-function renderMobileReport(){
-  const [ps,pe]=currentPeriod.split('|');
-  document.getElementById('report-mobile').innerHTML=reportData.map(row=>{
-    const ini=row.employee.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-    const sn=row.employee.name.replace(/'/g,"\\'");
+
+  document.getElementById('type-breakdown').innerHTML=WORK_TYPES.map(t=>`
+    <div class="type-chip ${TC_CHIP[t]}">
+      <span class="type-chip-label">${t}</span>
+      <span class="type-chip-val">${(totByType[t]/60).toFixed(1)}h</span>
+    </div>`).join('');
+
+  // render employee cards
+  const [ps,pe]=val.split('|');
+  document.getElementById('report-cards').innerHTML=reportData.map(row=>{
+    const ini=initials(row.employee.name); const sn=esc(row.employee.name);
     const entries=row.entries.filter(e=>e.clock_out).map(e=>{
-      const mins=Math.round((new Date(e.clock_out)-new Date(e.clock_in))/60000);
+      const mins=e.durationMins; const t=e.work_type||'Class';
       return `<div class="detail-entry-card">
         <div class="de-left">
-          <div class="de-date">${e.clock_in.slice(0,10)}</div>
-          <div class="de-times"><span class="de-in">${fmtTime(e.clock_in)}</span><span class="log-arrow">→</span><span class="de-out">${fmtTime(e.clock_out)}</span></div>
+          <div class="de-meta"><span class="de-date">${e.clock_in.slice(0,10)}</span><span class="de-badge ${TYPE_BADGE[t]}">${t}</span></div>
+          <div class="de-times"><span class="de-in">${fmtTime(e.clock_in)}</span><span class="log-arrow" style="margin:0 4px">→</span><span class="de-out">${fmtTime(e.clock_out)}</span></div>
         </div>
         <div style="display:flex;align-items:center;gap:8px">
           <div class="de-dur">${fmtDur(mins)}${e.overtime_mins>0?' ⚡':''}</div>
           <div class="de-actions">
-            <button class="action-btn edit" onclick="openEditEntryModal(${e.id},'${e.clock_in}','${e.clock_out||''}','${sn}')">✏</button>
+            <button class="action-btn edit" onclick="openEditEntryModal(${e.id},'${e.clock_in}','${e.clock_out||''}','${sn}','${esc(t)}')">✏</button>
             <button class="action-btn del" onclick="openDelEntryModal(${e.id},'${e.clock_in.slice(0,10)}','${sn}')">✕</button>
           </div>
         </div>
       </div>`;
     }).join('') || '<div style="padding:12px 16px;font-size:12px;color:var(--muted)">No entries this period</div>';
+
+    // per-employee type hours
+    const typeStats=WORK_TYPES.map(t=>`
+      <div class="hstat ${TYPE_HSTAT[t]}"><span class="hl">${t}</span><span class="hv">${((row.byType[t]||0)/60).toFixed(1)}h</span></div>`).join('');
+
     return `<div class="report-card">
       <div class="report-card-top">
         <div class="report-card-name"><span class="emp-avatar">${ini}</span>${row.employee.name}</div>
-        <button class="toggle-btn" onclick="toggleMobileDetail('md-${row.employee.id}')">details</button>
+        <div class="report-card-actions">
+          <button class="toggle-btn" onclick="toggleDetail('rc-${row.employee.id}')">details</button>
+          <button class="action-btn add" onclick="openAddEntryModal(${row.employee.id},'${sn}','${ps}','${pe}')">+ Add</button>
+        </div>
       </div>
-      <div class="report-card-hrs">
-        <div class="report-card-stat"><span class="slabel">Regular</span><span class="sval">${(row.totalRegular/60).toFixed(1)}h</span></div>
-        <div class="report-card-stat"><span class="slabel">Overtime</span><span class="sval ot">${row.totalOvertime>0?(row.totalOvertime/60).toFixed(1)+'h':'—'}</span></div>
-        <div class="report-card-stat"><span class="slabel">Total</span><span class="sval">${(row.totalMins/60).toFixed(1)}h</span></div>
+      <div class="hours-grid six">
+        ${typeStats}
+        <div class="hstat hv-amber"><span class="hl">OT</span><span class="hv">${(row.totalOvertime/60).toFixed(1)}h</span></div>
+        <div class="hstat"><span class="hl">Total</span><span class="hv">${(row.totalMins/60).toFixed(1)}h</span></div>
+        <div class="hstat"><span class="hl">Days</span><span class="hv">${row.days}</span></div>
       </div>
-      <div class="report-card-actions">
-        <button class="action-btn add" onclick="openAddEntryModal(${row.employee.id},'${sn}','${ps}','${pe}')">+ Add Time</button>
-      </div>
-      <div class="detail-section" id="md-${row.employee.id}">${entries}</div>
+      <div class="detail-section" id="rc-${row.employee.id}">${entries}</div>
     </div>`;
   }).join('');
 }
-function renderDesktopReport(){
-  const [ps,pe]=currentPeriod.split('|');
-  const wrap=document.getElementById('report-desktop-wrap');
-  wrap.style.display='';
-  document.getElementById('report-tbody').innerHTML=reportData.map(row=>{
-    const ini=row.employee.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-    const sn=row.employee.name.replace(/'/g,"\\'");
-    return `<tr class="data-row">
-      <td><span class="emp-avatar" style="margin-right:10px">${ini}</span><span class="emp-name">${row.employee.name}</span></td>
-      <td>${row.days}</td><td class="hrs-cell">${(row.totalRegular/60).toFixed(2)}</td>
-      <td class="ot-cell">${row.totalOvertime>0?'⚡ '+(row.totalOvertime/60).toFixed(2):'—'}</td>
-      <td class="hrs-cell">${(row.totalMins/60).toFixed(2)}</td>
-      <td style="white-space:nowrap;text-align:right">
-        <button class="toggle-btn" onclick="toggleDesktopDetail(${row.employee.id})">details</button>
-        <button class="action-btn add" style="margin-left:6px" onclick="openAddEntryModal(${row.employee.id},'${sn}','${ps}','${pe}')">+ Add</button>
-      </td>
-    </tr>
-    <tr class="detail-row" id="dd-${row.employee.id}"><td colspan="6" style="padding:0;background:var(--surface2)">
-      ${row.entries.filter(e=>e.clock_out).map(e=>{
-        const mins=Math.round((new Date(e.clock_out)-new Date(e.clock_in))/60000);
-        return `<div class="detail-entry-card" style="padding:10px 16px 10px 58px">
-          <div class="de-left"><div class="de-date">${e.clock_in.slice(0,10)}</div>
-          <div class="de-times"><span class="de-in">${fmtTime(e.clock_in)}</span><span class="log-arrow" style="margin:0 6px">→</span><span class="de-out">${fmtTime(e.clock_out)}</span></div></div>
-          <div style="display:flex;align-items:center;gap:10px">
-            <div class="de-dur">${fmtDur(mins)}${e.overtime_mins>0?' ⚡':''}</div>
-            <div class="de-actions">
-              <button class="action-btn edit" onclick="openEditEntryModal(${e.id},'${e.clock_in}','${e.clock_out||''}','${sn}')">✏ Edit</button>
-              <button class="action-btn del" onclick="openDelEntryModal(${e.id},'${e.clock_in.slice(0,10)}','${sn}')">✕</button>
-            </div>
-          </div>
-        </div>`;
-      }).join('') || '<div style="padding:12px 16px 12px 58px;font-size:12px;color:var(--muted)">No entries this period</div>'}
-    </td></tr>`;
-  }).join('');
-}
-function toggleMobileDetail(id){ document.getElementById(id).classList.toggle('open'); }
-function toggleDesktopDetail(id){ document.getElementById('dd-'+id).classList.toggle('open'); }
+function toggleDetail(id){ document.getElementById(id).classList.toggle('open'); }
 
-// ── TIME ENTRY MODALS ──
+// ── ENTRY MODALS ──
 function openAddEntryModal(empId,empName,ps,pe){
   closeAllModals(); addEntryEmpId=empId;
   document.getElementById('add-entry-sub').textContent='Employee: '+empName;
   document.getElementById('add-entry-err').textContent='';
-  const today=new Date().toISOString().slice(0,10);
-  document.getElementById('ae-date').value=today; document.getElementById('ae-date').min=ps; document.getElementById('ae-date').max=pe;
+  document.getElementById('ae-type').value='Class';
+  document.getElementById('ae-date').value=new Date().toISOString().slice(0,10);
+  document.getElementById('ae-date').min=ps; document.getElementById('ae-date').max=pe;
   document.getElementById('ae-in').value=''; document.getElementById('ae-out').value='';
   document.getElementById('modal-add-entry').classList.add('open');
 }
 async function saveAddEntry(){
-  const date=document.getElementById('ae-date').value,inT=document.getElementById('ae-in').value,outT=document.getElementById('ae-out').value;
+  const date=document.getElementById('ae-date').value,inT=document.getElementById('ae-in').value,outT=document.getElementById('ae-out').value,wt=document.getElementById('ae-type').value;
   if(!date||!inT){ document.getElementById('add-entry-err').textContent='Date and clock-in are required.'; return; }
-  const r=await fetch('/api/entries',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({employee_id:addEntryEmpId,clock_in:date+'T'+inT+':00',clock_out:outT?date+'T'+outT+':00':null})});
+  const r=await fetch('/api/entries',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({employee_id:addEntryEmpId,work_type:wt,clock_in:date+'T'+inT+':00',clock_out:outT?date+'T'+outT+':00':null})});
   const d=await r.json(); if(!r.ok){ document.getElementById('add-entry-err').textContent=d.error; return; }
   closeAllModals(); await loadReport();
 }
-function openEditEntryModal(id,clock_in,clock_out,empName){
+function openEditEntryModal(id,clock_in,clock_out,empName,workType){
   closeAllModals(); editingEntryId=id;
   document.getElementById('edit-entry-sub').textContent='Employee: '+empName;
   document.getElementById('edit-entry-err').textContent='';
+  document.getElementById('ee-type').value=workType||'Class';
   document.getElementById('ee-date').value=clock_in.slice(0,10);
   document.getElementById('ee-in').value=clock_in.slice(11,16);
   document.getElementById('ee-out').value=clock_out?clock_out.slice(11,16):'';
   document.getElementById('modal-edit-entry').classList.add('open');
 }
 async function saveEditEntry(){
-  const date=document.getElementById('ee-date').value,inT=document.getElementById('ee-in').value,outT=document.getElementById('ee-out').value;
+  const date=document.getElementById('ee-date').value,inT=document.getElementById('ee-in').value,outT=document.getElementById('ee-out').value,wt=document.getElementById('ee-type').value;
   if(!date||!inT){ document.getElementById('edit-entry-err').textContent='Date and clock-in are required.'; return; }
-  const r=await fetch(`/api/entries/${editingEntryId}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({clock_in:date+'T'+inT+':00',clock_out:outT?date+'T'+outT+':00':null})});
+  const r=await fetch(`/api/entries/${editingEntryId}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({work_type:wt,clock_in:date+'T'+inT+':00',clock_out:outT?date+'T'+outT+':00':null})});
   const d=await r.json(); if(!r.ok){ document.getElementById('edit-entry-err').textContent=d.error; return; }
   closeAllModals(); await loadReport();
 }
-function openDelEntryModal(id,date,empName){ closeAllModals(); editingEntryId=id; document.getElementById('del-entry-info').textContent=`Delete the entry on ${date} for ${empName}? This cannot be undone.`; document.getElementById('modal-del-entry').classList.add('open'); }
+function openDelEntryModal(id,date,empName){ closeAllModals(); editingEntryId=id; document.getElementById('del-entry-info').textContent=`Delete the entry on ${date} for ${empName}?`; document.getElementById('modal-del-entry').classList.add('open'); }
 async function confirmDelEntry(){ await fetch(`/api/entries/${editingEntryId}`,{method:'DELETE'}); closeAllModals(); await loadReport(); }
 
 // ── EMPLOYEE MGMT ──
 async function loadEmpTable(){
   const r=await fetch('/api/employees'); const emps=await r.json();
   document.getElementById('emp-list').innerHTML=emps.map(e=>{
-    const ini=e.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-    const sn=e.name.replace(/'/g,"\\'");
+    const sn=esc(e.name);
     return `<div class="emp-card">
-      <span class="emp-avatar">${ini}</span>
+      <span class="emp-avatar">${initials(e.name)}</span>
       <div class="emp-card-info">
         <div class="emp-card-name">${e.name}${e.is_admin?'<span class="badge-admin">Admin</span>':''}</div>
         <div class="emp-card-role">${e.is_admin?'Administrator':'Employee'}</div>
@@ -660,7 +714,7 @@ async function addEmployee(){
 function openEditEmpModal(id,name,is_admin){ closeAllModals(); editingEmpId=id; document.getElementById('edit-emp-err').textContent=''; document.getElementById('edit-emp-ok').textContent=''; document.getElementById('edit-emp-name').value=name; document.getElementById('edit-emp-admin').checked=!!is_admin; document.getElementById('modal-edit-emp').classList.add('open'); }
 async function saveEditEmp(){
   const name=document.getElementById('edit-emp-name').value.trim(),is_admin=document.getElementById('edit-emp-admin').checked;
-  if(!name){ document.getElementById('edit-emp-err').textContent='Name is required.'; return; }
+  if(!name){ document.getElementById('edit-emp-err').textContent='Name required.'; return; }
   const r=await fetch(`/api/employees/${editingEmpId}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,is_admin})});
   const d=await r.json(); if(!r.ok){ document.getElementById('edit-emp-err').textContent=d.error; return; }
   document.getElementById('edit-emp-ok').textContent='✓ Saved!'; await loadEmpFilter(); await loadEmpTable(); setTimeout(closeAllModals,700);
@@ -677,38 +731,16 @@ async function savePin(){
 function openDelEmpModal(id,name){ closeAllModals(); editingEmpId=id; document.getElementById('del-emp-info').textContent=`Remove "${name}"? This permanently deletes their account and all time entries.`; document.getElementById('modal-del-emp').classList.add('open'); }
 async function confirmDelEmp(){ await fetch(`/api/employees/${editingEmpId}`,{method:'DELETE'}); closeAllModals(); await loadEmpFilter(); await loadEmpTable(); }
 
-// ── MOBILE TOUCH FIXES ──
-// PIN keys — touchend fires instantly, no 300ms delay
-document.addEventListener('DOMContentLoaded', function() {
-  const pinGrid = document.getElementById('pin-grid');
-  if (!pinGrid) return;
-  pinGrid.addEventListener('touchend', function(e) {
-    e.preventDefault();
-    const btn = e.target.closest('[data-key]');
-    if (!btn) return;
-    const key = btn.getAttribute('data-key');
-    if (key === 'clear') clearPin();
-    else if (key === 'del') delPin();
-    else pinKey(key);
-  }, { passive: false });
-  pinGrid.addEventListener('click', function(e) {
-    const btn = e.target.closest('[data-key]');
-    if (!btn) return;
-    const key = btn.getAttribute('data-key');
-    if (key === 'clear') clearPin();
-    else if (key === 'del') delPin();
-    else pinKey(key);
-  });
-});
-
-
-
 // ── HELPERS ──
 function closeAllModals(){ document.querySelectorAll('.modal-overlay').forEach(m=>m.classList.remove('open')); }
 function showScreen(n){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById('screen-'+n).classList.add('active'); }
 function fmtTime(dt){ return new Date(dt).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}); }
 function fmtDur(mins){ const h=Math.floor(mins/60),m=mins%60; return h>0?`${h}h ${m}m`:`${m}m`; }
 function fmt(d){ return new Date(d+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }
+function initials(n){ return n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(); }
+function esc(s){ return s.replace(/'/g,"\\'"); }
+
+document.addEventListener('DOMContentLoaded', setupPin);
 </script>
 </body>
 </html>

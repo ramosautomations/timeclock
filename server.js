@@ -11,6 +11,8 @@ const dataDir = path.join(__dirname, 'data');
 if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
 const db = new Database(path.join(dataDir, 'timeclock.db'));
 
+const WORK_TYPES = ['Class', 'Front Desk', 'Private Class'];
+
 // Schema
 db.exec(`
   CREATE TABLE IF NOT EXISTS employees (
@@ -24,6 +26,7 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS time_entries (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     employee_id INTEGER NOT NULL,
+    work_type TEXT NOT NULL DEFAULT 'Class',
     clock_in TEXT NOT NULL,
     clock_out TEXT,
     regular_mins INTEGER DEFAULT 0,
@@ -38,6 +41,11 @@ db.exec(`
   );
 `);
 
+// Add work_type column if it doesn't exist (migration for existing DBs)
+try {
+  db.exec(`ALTER TABLE time_entries ADD COLUMN work_type TEXT NOT NULL DEFAULT 'Class'`);
+} catch(e) { /* column already exists */ }
+
 // Seed default data if empty
 const empCount = db.prepare('SELECT COUNT(*) as c FROM employees').get();
 if (empCount.c === 0) {
@@ -48,7 +56,6 @@ if (empCount.c === 0) {
   insert.run('Jordan Lee', '3333', 0);
   insert.run('Taylor Brooks', '4444', 0);
 
-  // Seed pay periods starting Jun 1 2026 going back
   const periodInsert = db.prepare('INSERT INTO pay_periods (start_date, end_date) VALUES (?, ?)');
   periodInsert.run('2026-05-29', '2026-06-11');
   periodInsert.run('2026-05-15', '2026-05-28');
@@ -56,19 +63,16 @@ if (empCount.c === 0) {
   periodInsert.run('2026-04-17', '2026-04-30');
 }
 
-// Generate pay periods dynamically (biweekly Fri-Thu, anchor: 2026-05-29)
+// Generate pay periods (biweekly Fri-Thu, anchor: 2026-05-29)
 function getPayPeriods(count = 10) {
-  const anchor = new Date('2026-05-29'); // Friday May 29 2026
+  const anchor = new Date('2026-05-29');
   const periods = [];
   for (let i = 0; i < count; i++) {
     const start = new Date(anchor);
     start.setDate(anchor.getDate() - i * 14);
     const end = new Date(start);
-    end.setDate(start.getDate() + 13); // 14 days: Fri to Thu
-    periods.push({
-      start: start.toISOString().slice(0, 10),
-      end: end.toISOString().slice(0, 10)
-    });
+    end.setDate(start.getDate() + 13);
+    periods.push({ start: start.toISOString().slice(0, 10), end: end.toISOString().slice(0, 10) });
   }
   return periods;
 }
@@ -80,11 +84,9 @@ function calcOvertimeForPeriod(employeeId, periodStart, periodEnd) {
     ORDER BY clock_in
   `).all(employeeId, periodStart, periodEnd);
 
-  // Group by week (Mon-Sun), then calc OT
   const weeklyMins = {};
   entries.forEach(e => {
     const d = new Date(e.clock_in);
-    // Get Monday of that week
     const day = d.getDay();
     const monday = new Date(d);
     monday.setDate(d.getDate() - (day === 0 ? 6 : day - 1));
@@ -95,42 +97,33 @@ function calcOvertimeForPeriod(employeeId, periodStart, periodEnd) {
 
   let totalRegular = 0, totalOvertime = 0;
   Object.values(weeklyMins).forEach(mins => {
-    const reg = Math.min(mins, 2400); // 40hrs = 2400 mins
-    const ot = Math.max(0, mins - 2400);
-    totalRegular += reg;
-    totalOvertime += ot;
+    totalRegular += Math.min(mins, 2400);
+    totalOvertime += Math.max(0, mins - 2400);
   });
   return { totalRegular, totalOvertime };
 }
 
 // ---- API ROUTES ----
 
-// PIN login
 app.post('/api/login', (req, res) => {
-  const { pin } = req.body;
-  const emp = db.prepare('SELECT * FROM employees WHERE pin = ?').get(pin);
+  const emp = db.prepare('SELECT * FROM employees WHERE pin = ?').get(req.body.pin);
   if (!emp) return res.status(401).json({ error: 'Invalid PIN' });
   res.json({ id: emp.id, name: emp.name, is_admin: emp.is_admin });
 });
 
-// Get all employees (admin)
 app.get('/api/employees', (req, res) => {
-  const emps = db.prepare('SELECT id, name, is_admin FROM employees ORDER BY name').all();
-  res.json(emps);
+  res.json(db.prepare('SELECT id, name, is_admin FROM employees ORDER BY name').all());
 });
 
-// Add employee (admin)
 app.post('/api/employees', (req, res) => {
   const { name, pin, is_admin } = req.body;
   if (!name || !pin) return res.status(400).json({ error: 'Name and PIN required' });
   if (pin.length < 4) return res.status(400).json({ error: 'PIN must be at least 4 digits' });
-  const existing = db.prepare('SELECT id FROM employees WHERE pin = ?').get(pin);
-  if (existing) return res.status(400).json({ error: 'PIN already in use' });
+  if (db.prepare('SELECT id FROM employees WHERE pin = ?').get(pin)) return res.status(400).json({ error: 'PIN already in use' });
   const result = db.prepare('INSERT INTO employees (name, pin, is_admin) VALUES (?, ?, ?)').run(name, pin, is_admin ? 1 : 0);
   res.json({ id: result.lastInsertRowid, name, is_admin: is_admin ? 1 : 0 });
 });
 
-// Edit employee (admin)
 app.put('/api/employees/:id', (req, res) => {
   const { name, is_admin } = req.body;
   if (!name) return res.status(400).json({ error: 'Name required' });
@@ -138,85 +131,61 @@ app.put('/api/employees/:id', (req, res) => {
   res.json({ ok: true });
 });
 
-// Reset PIN (admin)
 app.put('/api/employees/:id/pin', (req, res) => {
   const { pin } = req.body;
   if (!pin || pin.length < 4) return res.status(400).json({ error: 'PIN must be at least 4 digits' });
-  const existing = db.prepare('SELECT id FROM employees WHERE pin = ? AND id != ?').get(pin, req.params.id);
-  if (existing) return res.status(400).json({ error: 'PIN already in use' });
+  if (db.prepare('SELECT id FROM employees WHERE pin = ? AND id != ?').get(pin, req.params.id)) return res.status(400).json({ error: 'PIN already in use' });
   db.prepare('UPDATE employees SET pin = ? WHERE id = ?').run(pin, req.params.id);
   res.json({ ok: true });
 });
 
-// Delete employee (admin)
 app.delete('/api/employees/:id', (req, res) => {
   db.prepare('DELETE FROM time_entries WHERE employee_id = ?').run(req.params.id);
   db.prepare('DELETE FROM employees WHERE id = ?').run(req.params.id);
   res.json({ ok: true });
 });
 
-// Clock status for employee
+// Clock status — returns open entry if any
 app.get('/api/status/:employeeId', (req, res) => {
-  const open = db.prepare(`
-    SELECT * FROM time_entries WHERE employee_id = ? AND clock_out IS NULL ORDER BY clock_in DESC LIMIT 1
-  `).get(req.params.employeeId);
+  const open = db.prepare(`SELECT * FROM time_entries WHERE employee_id = ? AND clock_out IS NULL ORDER BY clock_in DESC LIMIT 1`).get(req.params.employeeId);
   res.json({ clocked_in: !!open, entry: open || null });
 });
 
-// Clock in
+// Clock in — requires work_type
 app.post('/api/clockin', (req, res) => {
-  const { employee_id } = req.body;
+  const { employee_id, work_type } = req.body;
+  if (!WORK_TYPES.includes(work_type)) return res.status(400).json({ error: 'Invalid work type' });
   const open = db.prepare('SELECT id FROM time_entries WHERE employee_id = ? AND clock_out IS NULL').get(employee_id);
   if (open) return res.status(400).json({ error: 'Already clocked in' });
   const now = new Date().toISOString();
-  const result = db.prepare('INSERT INTO time_entries (employee_id, clock_in) VALUES (?, ?)').run(employee_id, now);
-  const entry = db.prepare('SELECT * FROM time_entries WHERE id = ?').get(result.lastInsertRowid);
-  res.json(entry);
+  const result = db.prepare('INSERT INTO time_entries (employee_id, work_type, clock_in) VALUES (?, ?, ?)').run(employee_id, work_type, now);
+  res.json(db.prepare('SELECT * FROM time_entries WHERE id = ?').get(result.lastInsertRowid));
 });
 
 // Clock out
 app.post('/api/clockout', (req, res) => {
   const { employee_id } = req.body;
-  const open = db.prepare('SELECT * FROM time_entries WHERE employee_id = ? AND clock_out IS NULL ORDER BY clock_in DESC LIMIT 1').get(employee_id);
+  const open = db.prepare(`SELECT * FROM time_entries WHERE employee_id = ? AND clock_out IS NULL ORDER BY clock_in DESC LIMIT 1`).get(employee_id);
   if (!open) return res.status(400).json({ error: 'Not clocked in' });
-
   const now = new Date();
-  const clockIn = new Date(open.clock_in);
-  const totalMins = Math.round((now - clockIn) / 60000);
-
-  // Simple daily overtime: >8hrs/day = OT (also tracked weekly in reports)
+  const totalMins = Math.round((now - new Date(open.clock_in)) / 60000);
   const regular = Math.min(totalMins, 480);
   const overtime = Math.max(0, totalMins - 480);
-
-  const nowISO = new Date().toISOString();
-  db.prepare(`
-    UPDATE time_entries SET clock_out = ?, regular_mins = ?, overtime_mins = ? WHERE id = ?
-  `).run(nowISO, regular, overtime, open.id);
-
-  const entry = db.prepare('SELECT * FROM time_entries WHERE id = ?').get(open.id);
-  res.json(entry);
+  db.prepare(`UPDATE time_entries SET clock_out = ?, regular_mins = ?, overtime_mins = ? WHERE id = ?`).run(now.toISOString(), regular, overtime, open.id);
+  res.json(db.prepare('SELECT * FROM time_entries WHERE id = ?').get(open.id));
 });
 
-// Today's log for employee
+// Today's log
 app.get('/api/today/:employeeId', (req, res) => {
-  const entries = db.prepare(`
-    SELECT * FROM time_entries
-    WHERE employee_id = ? AND date(clock_in) = date('now')
-    ORDER BY clock_in
-  `).all(req.params.employeeId);
-  res.json(entries);
+  res.json(db.prepare(`SELECT * FROM time_entries WHERE employee_id = ? AND date(clock_in) = date('now') ORDER BY clock_in`).all(req.params.employeeId));
 });
 
-// Pay periods list
-app.get('/api/payperiods', (req, res) => {
-  res.json(getPayPeriods(12));
-});
+app.get('/api/payperiods', (req, res) => res.json(getPayPeriods(12)));
 
-// Admin: report for a pay period
+// Admin report — includes per-type breakdown
 app.get('/api/report', (req, res) => {
   const { start, end, employee_id } = req.query;
-  let empQuery = 'SELECT id, name FROM employees WHERE is_admin = 0 ORDER BY name';
-  let emps = db.prepare(empQuery).all();
+  let emps = db.prepare('SELECT id, name FROM employees WHERE is_admin = 0 ORDER BY name').all();
   if (employee_id) emps = emps.filter(e => e.id == employee_id);
 
   const report = emps.map(emp => {
@@ -228,11 +197,16 @@ app.get('/api/report', (req, res) => {
 
     let totalMins = 0;
     const days = new Set();
+    const byType = {};
+    WORK_TYPES.forEach(t => { byType[t] = 0; });
+
     entries.forEach(e => {
       if (e.clock_out) {
         const mins = Math.round((new Date(e.clock_out) - new Date(e.clock_in)) / 60000);
         totalMins += mins;
         days.add(e.clock_in.slice(0, 10));
+        const t = e.work_type || 'Class';
+        byType[t] = (byType[t] || 0) + mins;
       }
     });
 
@@ -243,6 +217,7 @@ app.get('/api/report', (req, res) => {
       totalMins,
       totalRegular,
       totalOvertime,
+      byType,
       days: days.size,
       entries: entries.map(e => ({
         ...e,
@@ -254,11 +229,7 @@ app.get('/api/report', (req, res) => {
   res.json(report);
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`TimeClock running on http://localhost:${PORT}`));
-// ---- ADMIN TIME ENTRY MANAGEMENT ----
-
-// Get all entries for an employee (admin)
+// Admin: get entries for employee
 app.get('/api/entries/:employeeId', (req, res) => {
   const { start, end } = req.query;
   let sql = `SELECT * FROM time_entries WHERE employee_id = ?`;
@@ -268,10 +239,11 @@ app.get('/api/entries/:employeeId', (req, res) => {
   res.json(db.prepare(sql).all(...params));
 });
 
-// Add a manual time entry (admin)
+// Admin: add manual entry
 app.post('/api/entries', (req, res) => {
-  const { employee_id, clock_in, clock_out } = req.body;
-  if (!employee_id || !clock_in) return res.status(400).json({ error: 'employee_id and clock_in are required' });
+  const { employee_id, work_type, clock_in, clock_out } = req.body;
+  if (!employee_id || !clock_in) return res.status(400).json({ error: 'employee_id and clock_in required' });
+  if (!WORK_TYPES.includes(work_type)) return res.status(400).json({ error: 'Invalid work type' });
   if (clock_out && clock_out <= clock_in) return res.status(400).json({ error: 'Clock-out must be after clock-in' });
   let regular_mins = 0, overtime_mins = 0;
   if (clock_out) {
@@ -279,17 +251,15 @@ app.post('/api/entries', (req, res) => {
     regular_mins = Math.min(totalMins, 480);
     overtime_mins = Math.max(0, totalMins - 480);
   }
-  const result = db.prepare(`
-    INSERT INTO time_entries (employee_id, clock_in, clock_out, regular_mins, overtime_mins)
-    VALUES (?, ?, ?, ?, ?)
-  `).run(employee_id, clock_in, clock_out || null, regular_mins, overtime_mins);
+  const result = db.prepare(`INSERT INTO time_entries (employee_id, work_type, clock_in, clock_out, regular_mins, overtime_mins) VALUES (?, ?, ?, ?, ?, ?)`).run(employee_id, work_type, clock_in, clock_out || null, regular_mins, overtime_mins);
   res.json(db.prepare('SELECT * FROM time_entries WHERE id = ?').get(result.lastInsertRowid));
 });
 
-// Edit a time entry (admin)
+// Admin: edit entry
 app.put('/api/entries/:id', (req, res) => {
-  const { clock_in, clock_out } = req.body;
-  if (!clock_in) return res.status(400).json({ error: 'clock_in is required' });
+  const { work_type, clock_in, clock_out } = req.body;
+  if (!clock_in) return res.status(400).json({ error: 'clock_in required' });
+  if (!WORK_TYPES.includes(work_type)) return res.status(400).json({ error: 'Invalid work type' });
   if (clock_out && clock_out <= clock_in) return res.status(400).json({ error: 'Clock-out must be after clock-in' });
   let regular_mins = 0, overtime_mins = 0;
   if (clock_out) {
@@ -297,14 +267,15 @@ app.put('/api/entries/:id', (req, res) => {
     regular_mins = Math.min(totalMins, 480);
     overtime_mins = Math.max(0, totalMins - 480);
   }
-  db.prepare(`
-    UPDATE time_entries SET clock_in=?, clock_out=?, regular_mins=?, overtime_mins=? WHERE id=?
-  `).run(clock_in, clock_out || null, regular_mins, overtime_mins, req.params.id);
+  db.prepare(`UPDATE time_entries SET work_type=?, clock_in=?, clock_out=?, regular_mins=?, overtime_mins=? WHERE id=?`).run(work_type, clock_in, clock_out || null, regular_mins, overtime_mins, req.params.id);
   res.json(db.prepare('SELECT * FROM time_entries WHERE id=?').get(req.params.id));
 });
 
-// Delete a time entry (admin)
+// Admin: delete entry
 app.delete('/api/entries/:id', (req, res) => {
   db.prepare('DELETE FROM time_entries WHERE id=?').run(req.params.id);
   res.json({ ok: true });
 });
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`TimeClock running on http://localhost:${PORT}`));
