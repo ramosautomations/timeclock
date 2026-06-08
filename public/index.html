@@ -438,7 +438,7 @@ async function tryLogin(){
 function logout(){ currentUser=null; pinBuffer=''; updateDots(); if(durationTimer)clearInterval(durationTimer); if(clockTick)clearInterval(clockTick); showScreen('login'); }
 
 // ── EMPLOYEE ──
-async function showEmployee(){ showScreen('employee'); document.getElementById('emp-name-display').textContent=currentUser.name; startClock(); await refreshStatus(); await loadTodayLog(); }
+async function showEmployee(){ showScreen('employee'); document.getElementById('emp-name-display').textContent=currentUser.name; startClock(); await refreshStatus(); await loadTodayLog(); bindClockBtn(); }
 function startClock(){
   if(clockTick)clearInterval(clockTick);
   const tick=()=>{ const n=new Date(); document.getElementById('live-time').textContent=n.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'}); document.getElementById('live-date').textContent=n.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}); };
@@ -458,7 +458,7 @@ function startDur(){
 function pad(n){ return n.toString().padStart(2,'0'); }
 async function toggleClock(){
   await fetch(clockedIn?'/api/clockout':'/api/clockin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({employee_id:currentUser.id})});
-  await refreshStatus(); await loadTodayLog();
+  await refreshStatus(); await loadTodayLog(); bindClockBtn();
 }
 async function loadTodayLog(){
   const r=await fetch('/api/today/'+currentUser.id); const entries=await r.json();
@@ -665,56 +665,48 @@ function openDelEmpModal(id,name){ closeAllModals(); editingEmpId=id; document.g
 async function confirmDelEmp(){ await fetch(`/api/employees/${editingEmpId}`,{method:'DELETE'}); closeAllModals(); await loadEmpFilter(); await loadEmpTable(); }
 
 // ── MOBILE TOUCH FIXES ──
-function setupTouchEvents() {
-  // PIN keys — use touchend to fire immediately without 300ms delay
+// PIN keys — touchend fires instantly, no 300ms delay
+document.addEventListener('DOMContentLoaded', function() {
   const pinGrid = document.getElementById('pin-grid');
-  if (pinGrid) {
-    pinGrid.addEventListener('touchend', function(e) {
-      e.preventDefault(); // prevents the delayed click from also firing
-      const btn = e.target.closest('[data-key]');
-      if (!btn) return;
-      const key = btn.getAttribute('data-key');
-      if (key === 'clear') clearPin();
-      else if (key === 'del') delPin();
-      else pinKey(key);
-    }, { passive: false });
-    // Also handle regular click for desktop
-    pinGrid.addEventListener('click', function(e) {
-      const btn = e.target.closest('[data-key]');
-      if (!btn) return;
-      const key = btn.getAttribute('data-key');
-      if (key === 'clear') clearPin();
-      else if (key === 'del') delPin();
-      else pinKey(key);
-    });
-  }
-
-  // Clock button — bind both touchend and click robustly
-  function bindClockBtn() {
-    const btn = document.getElementById('clock-btn');
+  if (!pinGrid) return;
+  pinGrid.addEventListener('touchend', function(e) {
+    e.preventDefault();
+    const btn = e.target.closest('[data-key]');
     if (!btn) return;
-    let tapped = false;
-    btn.addEventListener('touchend', function(e) {
-      e.preventDefault();
-      if (tapped) return;
-      tapped = true;
-      setTimeout(() => { tapped = false; }, 800);
-      toggleClock();
-    }, { passive: false });
-    btn.addEventListener('click', function(e) {
-      if (tapped) return; // already handled by touchend
-      toggleClock();
-    });
-  }
-  bindClockBtn();
-  // Re-bind after status refresh since button state changes
-  const origRefresh = window.refreshStatus;
-  window.refreshStatus = async function() {
-    await origRefresh();
-    bindClockBtn();
-  };
+    const key = btn.getAttribute('data-key');
+    if (key === 'clear') clearPin();
+    else if (key === 'del') delPin();
+    else pinKey(key);
+  }, { passive: false });
+  pinGrid.addEventListener('click', function(e) {
+    const btn = e.target.closest('[data-key]');
+    if (!btn) return;
+    const key = btn.getAttribute('data-key');
+    if (key === 'clear') clearPin();
+    else if (key === 'del') delPin();
+    else pinKey(key);
+  });
+});
+
+// Clock button — called after employee screen is shown and status loaded
+function bindClockBtn() {
+  const btn = document.getElementById('clock-btn');
+  if (!btn) return;
+  // Clone to wipe any stale listeners
+  const fresh = btn.cloneNode(true);
+  btn.parentNode.replaceChild(fresh, btn);
+  let busy = false;
+  fresh.addEventListener('touchend', function(e) {
+    e.preventDefault();
+    if (busy) return; busy = true;
+    setTimeout(() => { busy = false; }, 800);
+    toggleClock();
+  }, { passive: false });
+  fresh.addEventListener('click', function() {
+    if (busy) return;
+    toggleClock();
+  });
 }
-document.addEventListener('DOMContentLoaded', setupTouchEvents);
 
 // ── HELPERS ──
 function closeAllModals(){ document.querySelectorAll('.modal-overlay').forEach(m=>m.classList.remove('open')); }
