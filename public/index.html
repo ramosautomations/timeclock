@@ -254,7 +254,7 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
       <div class="status-pill out" id="status-pill"><span class="status-dot"></span><span id="status-text">Clocked Out</span></div>
       <div class="duration-counter" id="duration-counter"></div>
     </div>
-    <button class="btn-clock clock-in" id="clock-btn">Clock In</button>
+    <button class="btn-clock clock-in" id="clock-btn" onclick="toggleClock()">Clock In</button>
     <div class="today-section">
       <div class="section-label">Today's entries</div>
       <div class="log-list" id="log-list"></div>
@@ -438,7 +438,7 @@ async function tryLogin(){
 function logout(){ currentUser=null; pinBuffer=''; updateDots(); if(durationTimer)clearInterval(durationTimer); if(clockTick)clearInterval(clockTick); showScreen('login'); }
 
 // ── EMPLOYEE ──
-async function showEmployee(){ showScreen('employee'); document.getElementById('emp-name-display').textContent=currentUser.name; startClock(); await refreshStatus(); await loadTodayLog(); bindClockBtn(); }
+async function showEmployee(){ showScreen('employee'); document.getElementById('emp-name-display').textContent=currentUser.name; startClock(); await refreshStatus(); await loadTodayLog(); }
 function startClock(){
   if(clockTick)clearInterval(clockTick);
   const tick=()=>{ const n=new Date(); document.getElementById('live-time').textContent=n.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'}); document.getElementById('live-date').textContent=n.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}); };
@@ -456,9 +456,17 @@ function startDur(){
   u(); durationTimer=setInterval(u,1000);
 }
 function pad(n){ return n.toString().padStart(2,'0'); }
+let clockBusy = false;
 async function toggleClock(){
-  await fetch(clockedIn?'/api/clockout':'/api/clockin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({employee_id:currentUser.id})});
-  await refreshStatus(); await loadTodayLog(); bindClockBtn();
+  if (clockBusy) return;
+  clockBusy = true;
+  try {
+    await fetch(clockedIn?'/api/clockout':'/api/clockin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({employee_id:currentUser.id})});
+    await refreshStatus();
+    await loadTodayLog();
+  } finally {
+    clockBusy = false;
+  }
 }
 async function loadTodayLog(){
   const r=await fetch('/api/today/'+currentUser.id); const entries=await r.json();
@@ -688,25 +696,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
-// Clock button — called after employee screen is shown and status loaded
-function bindClockBtn() {
-  const btn = document.getElementById('clock-btn');
-  if (!btn) return;
-  // Clone to wipe any stale listeners
-  const fresh = btn.cloneNode(true);
-  btn.parentNode.replaceChild(fresh, btn);
-  let busy = false;
-  fresh.addEventListener('touchend', function(e) {
-    e.preventDefault();
-    if (busy) return; busy = true;
-    setTimeout(() => { busy = false; }, 800);
-    toggleClock();
-  }, { passive: false });
-  fresh.addEventListener('click', function() {
-    if (busy) return;
-    toggleClock();
-  });
-}
+
 
 // ── HELPERS ──
 function closeAllModals(){ document.querySelectorAll('.modal-overlay').forEach(m=>m.classList.remove('open')); }
