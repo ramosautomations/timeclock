@@ -168,7 +168,8 @@ app.post('/api/clockin', (req, res) => {
   const { employee_id } = req.body;
   const open = db.prepare('SELECT id FROM time_entries WHERE employee_id = ? AND clock_out IS NULL').get(employee_id);
   if (open) return res.status(400).json({ error: 'Already clocked in' });
-  const result = db.prepare('INSERT INTO time_entries (employee_id, clock_in) VALUES (?, datetime("now"))').run(employee_id);
+  const now = new Date().toISOString();
+  const result = db.prepare('INSERT INTO time_entries (employee_id, clock_in) VALUES (?, ?)').run(employee_id, now);
   const entry = db.prepare('SELECT * FROM time_entries WHERE id = ?').get(result.lastInsertRowid);
   res.json(entry);
 });
@@ -187,9 +188,10 @@ app.post('/api/clockout', (req, res) => {
   const regular = Math.min(totalMins, 480);
   const overtime = Math.max(0, totalMins - 480);
 
+  const nowISO = new Date().toISOString();
   db.prepare(`
-    UPDATE time_entries SET clock_out = datetime('now'), regular_mins = ?, overtime_mins = ? WHERE id = ?
-  `).run(regular, overtime, open.id);
+    UPDATE time_entries SET clock_out = ?, regular_mins = ?, overtime_mins = ? WHERE id = ?
+  `).run(nowISO, regular, overtime, open.id);
 
   const entry = db.prepare('SELECT * FROM time_entries WHERE id = ?').get(open.id);
   res.json(entry);

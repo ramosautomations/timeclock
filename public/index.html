@@ -456,16 +456,21 @@ function startDur(){
   u(); durationTimer=setInterval(u,1000);
 }
 function pad(n){ return n.toString().padStart(2,'0'); }
-let clockBusy = false;
 async function toggleClock(){
-  if (clockBusy) return;
-  clockBusy = true;
+  const btn = document.getElementById('clock-btn');
+  if (btn.disabled) return;
+  btn.disabled = true;
+  btn.style.opacity = '0.6';
   try {
-    await fetch(clockedIn?'/api/clockout':'/api/clockin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({employee_id:currentUser.id})});
+    const res = await fetch(clockedIn?'/api/clockout':'/api/clockin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({employee_id:currentUser.id})});
+    if (!res.ok) { const e = await res.json(); alert(e.error || 'Error'); return; }
     await refreshStatus();
     await loadTodayLog();
+  } catch(e) {
+    alert('Network error. Please try again.');
   } finally {
-    clockBusy = false;
+    btn.disabled = false;
+    btn.style.opacity = '';
   }
 }
 async function loadTodayLog(){
