@@ -120,15 +120,17 @@ app.post('/api/employees', (req, res) => {
   if (!name || !pin) return res.status(400).json({ error: 'Name and PIN required' });
   if (pin.length < 4) return res.status(400).json({ error: 'PIN must be at least 4 digits' });
   if (db.prepare('SELECT id FROM employees WHERE pin = ?').get(pin)) return res.status(400).json({ error: 'PIN already in use' });
-  const result = db.prepare('INSERT INTO employees (name, pin, is_admin) VALUES (?, ?, ?)').run(name, pin, is_admin ? 1 : 0);
-  res.json({ id: result.lastInsertRowid, name, is_admin: is_admin ? 1 : 0 });
+  const isAdminInt = is_admin ? 1 : 0;
+  const result = db.prepare('INSERT INTO employees (name, pin, is_admin) VALUES (?, ?, ?)').run(name, pin, isAdminInt);
+  res.json({ id: result.lastInsertRowid, name, is_admin: isAdminInt });
 });
 
 app.put('/api/employees/:id', (req, res) => {
   const { name, is_admin } = req.body;
   if (!name) return res.status(400).json({ error: 'Name required' });
-  db.prepare('UPDATE employees SET name = ?, is_admin = ? WHERE id = ?').run(name, is_admin ? 1 : 0, req.params.id);
-  res.json({ ok: true });
+  const isAdminInt = is_admin ? 1 : 0;
+  db.prepare('UPDATE employees SET name = ?, is_admin = ? WHERE id = ?').run(name, isAdminInt, req.params.id);
+  res.json({ ok: true, id: req.params.id, name, is_admin: isAdminInt });
 });
 
 app.put('/api/employees/:id/pin', (req, res) => {

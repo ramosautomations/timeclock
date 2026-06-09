@@ -852,19 +852,28 @@ async function loadEmpTable(){
 }
 function openAddEmpModal(){ closeAllModals(); document.getElementById('add-emp-err').textContent=''; document.getElementById('new-name').value=''; document.getElementById('new-pin').value=''; document.getElementById('new-admin').checked=false; document.getElementById('modal-add-emp').classList.add('open'); }
 async function addEmployee(){
-  const name=document.getElementById('new-name').value.trim(),pin=document.getElementById('new-pin').value.trim(),is_admin=document.getElementById('new-admin').checked;
+  const name=document.getElementById('new-name').value.trim();
+  const pin=document.getElementById('new-pin').value.trim();
+  const is_admin=document.getElementById('new-admin').checked ? 1 : 0;
   if(!name||!pin){ document.getElementById('add-emp-err').textContent='Name and PIN required.'; return; }
-  const r=await fetch('/api/employees',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,pin,is_admin})});
-  const d=await r.json(); if(!r.ok){ document.getElementById('add-emp-err').textContent=d.error; return; }
-  closeAllModals(); await loadEmpFilter(); await loadEmpTable();
+  try {
+    const r=await fetch('/api/employees',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,pin,is_admin})});
+    const d=await r.json();
+    if(!r.ok){ document.getElementById('add-emp-err').textContent=d.error; return; }
+    closeAllModals(); await loadEmpFilter(); await loadEmpTable();
+  } catch(e) { document.getElementById('add-emp-err').textContent='Network error. Try again.'; }
 }
 function openEditEmpModal(id,name,is_admin){ closeAllModals(); editingEmpId=id; document.getElementById('edit-emp-err').textContent=''; document.getElementById('edit-emp-ok').textContent=''; document.getElementById('edit-emp-name').value=name; document.getElementById('edit-emp-admin').checked=!!is_admin; document.getElementById('modal-edit-emp').classList.add('open'); }
 async function saveEditEmp(){
-  const name=document.getElementById('edit-emp-name').value.trim(),is_admin=document.getElementById('edit-emp-admin').checked;
+  const name=document.getElementById('edit-emp-name').value.trim();
+  const is_admin=document.getElementById('edit-emp-admin').checked ? 1 : 0;
   if(!name){ document.getElementById('edit-emp-err').textContent='Name required.'; return; }
-  const r=await fetch(`/api/employees/${editingEmpId}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,is_admin})});
-  const d=await r.json(); if(!r.ok){ document.getElementById('edit-emp-err').textContent=d.error; return; }
-  document.getElementById('edit-emp-ok').textContent='✓ Saved!'; await loadEmpFilter(); await loadEmpTable(); setTimeout(closeAllModals,700);
+  try {
+    const r=await fetch(`/api/employees/${editingEmpId}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,is_admin})});
+    const d=await r.json();
+    if(!r.ok){ document.getElementById('edit-emp-err').textContent=d.error; return; }
+    document.getElementById('edit-emp-ok').textContent='✓ Saved!'; await loadEmpFilter(); await loadEmpTable(); setTimeout(closeAllModals,700);
+  } catch(e) { document.getElementById('edit-emp-err').textContent='Network error. Try again.'; }
 }
 function openPinModal(id,name){ closeAllModals(); editingEmpId=id; document.getElementById('pin-err').textContent=''; document.getElementById('pin-ok').textContent=''; document.getElementById('pin-info').textContent='Resetting PIN for: '+name; document.getElementById('reset-pin').value=''; document.getElementById('reset-pin2').value=''; document.getElementById('modal-pin').classList.add('open'); }
 async function savePin(){
