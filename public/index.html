@@ -219,10 +219,11 @@ input, button, select { font-family: var(--sans); -webkit-appearance: none; appe
 .emp-panel.active { display: flex; flex-direction: column; flex: 1; }
 /* ── EMPLOYEE HISTORY ── */
 .history-body { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 1.25rem; padding-bottom: calc(1.25rem + var(--safe-b)); }
-.period-picker { display: flex; gap: 8px; margin-bottom: 1.25rem; }
+.period-picker { display: flex; gap: 8px; margin-bottom: 1.25rem; width: 100%; }
 .period-picker select { flex: 1; background: var(--surface); border: 1.5px solid var(--border); color: var(--text); font-size: 13px; padding: 9px 28px 9px 12px; border-radius: var(--radius-sm); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; }
 .period-summary { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 1.25rem; }
 @media(min-width:400px){ .period-summary { grid-template-columns: repeat(4, 1fr); } }
+@media(min-width:768px){ .period-summary { grid-template-columns: repeat(4, 1fr); gap: 14px; } }
 .ps-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; }
 .ps-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; font-weight: 500; display: block; margin-bottom: 4px; }
 .ps-val { font-family: var(--mono); font-size: 18px; font-weight: 700; display: block; }
@@ -295,10 +296,10 @@ input, button, select { font-family: var(--sans); -webkit-appearance: none; appe
   #epanel-clock .type-btns { max-width: 600px; margin: 0 auto; }
   #epanel-clock .btn-clock { max-width: 600px; margin: 0 auto; }
   #epanel-clock .status-pill { display: inline-flex; }
-  .live-time { font-size: 64px; }
+  .live-time { font-size: 48px; }
   .type-btn { padding: 16px 8px; font-size: 14px; }
   .btn-clock { padding: 20px; font-size: 17px; }
-  #epanel-history .history-body { padding: 2.5rem; max-width: 1200px; margin: 0 auto; }
+  #epanel-history .history-body { padding: 2.5rem; max-width: 100%; width: 100%; margin: 0; }
 
   /* Admin header */
   .admin-header-top { padding: 1.1rem 2.5rem; }
@@ -336,11 +337,20 @@ input, button, select { font-family: var(--sans); -webkit-appearance: none; appe
   .btn-primary, .btn-cancel { font-size: 15px; padding: 14px; }
   .toggle-row { padding: 14px 16px; }
   .toggle-row-label { font-size: 15px; }
+  /* History desktop */
+  .hist-type-chip { padding: 12px 16px; flex: none; min-width: 160px; }
+  .htc-val { font-size: 20px; }
+  .hist-entry { padding: 16px 18px; }
+  .hist-entry-top { margin-bottom: 10px; }
+  .hist-entry-date { font-size: 13px; }
+  .hist-entry-dur { font-size: 14px; }
+  .ps-card { padding: 14px 16px; }
+  .ps-val { font-size: 22px; }
 }
 @media (min-width: 1100px) {
   .admin-body { max-width: 1400px; }
   #epanel-clock .emp-body { max-width: 1400px; }
-  #epanel-history .history-body { max-width: 1400px; }
+  #epanel-history .history-body { max-width: 100%; }
   .type-breakdown { flex-wrap: nowrap; }
   .metrics-row { grid-template-columns: repeat(4, 1fr); }
 }
