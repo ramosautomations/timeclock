@@ -211,6 +211,39 @@ input, button, select { font-family: var(--sans); -webkit-appearance: none; appe
 .action-btn.pin:hover { border-color: var(--amber); color: var(--amber); }
 .action-btn.add:hover { border-color: var(--accent); color: var(--accent); }
 
+/* ── EMPLOYEE TABS ── */
+.emp-nav { display: flex; border-bottom: 1.5px solid var(--border); background: var(--surface); flex-shrink: 0; }
+.emp-tab { flex: 1; background: none; border: none; border-bottom: 2.5px solid transparent; color: var(--muted); font-size: 13px; font-family: var(--sans); font-weight: 500; padding: 11px 8px; cursor: pointer; touch-action: manipulation; text-align: center; transition: all 0.15s; }
+.emp-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.emp-panel { display: none; }
+.emp-panel.active { display: flex; flex-direction: column; flex: 1; }
+/* ── EMPLOYEE HISTORY ── */
+.history-body { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 1.25rem; padding-bottom: calc(1.25rem + var(--safe-b)); }
+.period-picker { display: flex; gap: 8px; margin-bottom: 1.25rem; }
+.period-picker select { flex: 1; background: var(--surface); border: 1.5px solid var(--border); color: var(--text); font-size: 13px; padding: 9px 28px 9px 12px; border-radius: var(--radius-sm); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; }
+.period-summary { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 1.25rem; }
+@media(min-width:400px){ .period-summary { grid-template-columns: repeat(4, 1fr); } }
+.ps-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; }
+.ps-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; font-weight: 500; display: block; margin-bottom: 4px; }
+.ps-val { font-family: var(--mono); font-size: 18px; font-weight: 700; display: block; }
+.ps-val.red { color: var(--accent); } .ps-val.amber { color: var(--amber); }
+.hist-type-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.25rem; }
+.hist-type-chip { flex: 1; min-width: 80px; background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 8px 10px; text-align: center; }
+.htc-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 3px; }
+.htc-val { font-family: var(--mono); font-size: 15px; font-weight: 700; display: block; }
+.htc-blue { border-color: var(--blue); } .htc-blue .htc-label { color: var(--blue); }
+.htc-green { border-color: var(--green); } .htc-green .htc-label { color: var(--green); }
+.htc-purple { border-color: var(--purple); } .htc-purple .htc-label { color: var(--purple); }
+.hist-entries { display: flex; flex-direction: column; gap: 8px; }
+.hist-entry { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; }
+.hist-entry-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.hist-entry-date { font-size: 12px; color: var(--muted); font-weight: 500; }
+.hist-entry-dur { font-family: var(--mono); font-size: 13px; font-weight: 600; }
+.hist-entry-dur.ot { color: var(--amber); }
+.hist-entry-times { font-family: var(--mono); font-size: 13px; display: flex; align-items: center; gap: 4px; }
+.hist-entry-times .log-in { color: var(--accent); }
+.hist-no-entries { font-size: 13px; color: var(--muted); text-align: center; padding: 2.5rem 1rem; background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-sm); }
+
 /* modal */
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 200; align-items: flex-end; justify-content: center; }
 @media(min-width:500px){ .modal-overlay { align-items: center; padding: 1rem; } }
@@ -268,30 +301,50 @@ input, button, select { font-family: var(--sans); -webkit-appearance: none; appe
     <div class="top-bar-title"><span>Hi, </span><span id="emp-name-display">—</span></div>
     <button class="btn-sm" onclick="logout()">Sign out</button>
   </div>
-  <div class="emp-body">
-    <div class="clock-hero">
-      <div class="live-time" id="live-time">00:00:00</div>
-      <div class="live-date" id="live-date"></div>
-    </div>
+  <!-- employee tabs -->
+  <div class="emp-nav">
+    <button class="emp-tab active" id="etab-clock" onclick="switchEmpTab('clock')">Clock</button>
+    <button class="emp-tab" id="etab-history" onclick="switchEmpTab('history')">My History</button>
+  </div>
 
-    <!-- Work type selector (shown when clocked out) -->
-    <div class="type-selector" id="type-selector">
-      <div class="type-label">Select work type</div>
-      <div class="type-btns">
-        <button class="type-btn type-class" data-type="Class" onclick="selectType('Class')">Class</button>
-        <button class="type-btn type-desk" data-type="Front Desk" onclick="selectType('Front Desk')">Front Desk</button>
-        <button class="type-btn type-private" data-type="Private Class" onclick="selectType('Private Class')">Private Class</button>
+  <!-- CLOCK PANEL -->
+  <div class="emp-panel active" id="epanel-clock">
+    <div class="emp-body">
+      <div class="clock-hero">
+        <div class="live-time" id="live-time">00:00:00</div>
+        <div class="live-date" id="live-date"></div>
+      </div>
+
+      <div class="type-selector" id="type-selector">
+        <div class="type-label">Select work type</div>
+        <div class="type-btns">
+          <button class="type-btn type-class" data-type="Class" onclick="selectType('Class')">Class</button>
+          <button class="type-btn type-desk" data-type="Front Desk" onclick="selectType('Front Desk')">Front Desk</button>
+          <button class="type-btn type-private" data-type="Private Class" onclick="selectType('Private Class')">Private Class</button>
+        </div>
+      </div>
+
+      <div class="status-pill out" id="status-pill"><span class="status-dot"></span><span id="status-text">Clocked Out</span></div>
+      <div class="duration-counter" id="duration-counter"></div>
+
+      <button class="btn-clock clock-in" id="clock-btn" onclick="toggleClock()">Select a work type</button>
+
+      <div class="today-section">
+        <div class="section-label">Today's entries</div>
+        <div class="log-list" id="log-list"></div>
       </div>
     </div>
+  </div>
 
-    <div class="status-pill out" id="status-pill"><span class="status-dot"></span><span id="status-text">Clocked Out</span></div>
-    <div class="duration-counter" id="duration-counter"></div>
-
-    <button class="btn-clock clock-in" id="clock-btn" onclick="toggleClock()">Select a work type</button>
-
-    <div class="today-section">
-      <div class="section-label">Today's entries</div>
-      <div class="log-list" id="log-list"></div>
+  <!-- HISTORY PANEL -->
+  <div class="emp-panel" id="epanel-history">
+    <div class="history-body">
+      <div class="period-picker">
+        <select id="emp-period-select" onchange="loadEmpHistory()"><option value="">Loading…</option></select>
+      </div>
+      <div class="period-summary" id="emp-period-summary"></div>
+      <div class="hist-type-row" id="emp-type-row"></div>
+      <div class="hist-entries" id="emp-hist-entries"></div>
     </div>
   </div>
 </div>
@@ -469,6 +522,8 @@ async function showEmployee(){
   document.getElementById('emp-name-display').textContent=currentUser.name;
   selectedType=null; updateTypeUI();
   startClock(); await refreshStatus(); await loadTodayLog();
+  await loadEmpPeriods();
+  switchEmpTab('clock');
 }
 function startClock(){
   if(clockTick)clearInterval(clockTick);
@@ -551,6 +606,97 @@ async function loadTodayLog(){
         <div class="log-times"><span class="log-in">${inT}</span>${outT?`<span class="log-arrow">→</span><span class="log-out">${outT}</span>`:'<span class="log-arrow"> ongoing…</span>'}</div>
       </div>
       ${mins?`<div class="log-dur ${e.overtime_mins>0?'ot':''}">${fmtDur(mins)}${e.overtime_mins>0?' ⚡':''}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ── EMPLOYEE TABS ──
+function switchEmpTab(tab) {
+  document.querySelectorAll('.emp-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.emp-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('etab-' + tab).classList.add('active');
+  document.getElementById('epanel-' + tab).classList.add('active');
+  if (tab === 'history') loadEmpHistory();
+}
+
+async function loadEmpPeriods() {
+  const r = await fetch('/api/payperiods');
+  const ps = await r.json();
+  document.getElementById('emp-period-select').innerHTML = ps.map((p, i) =>
+    `<option value="${p.start}|${p.end}" ${i===0?'selected':''}>${fmt(p.start)} – ${fmt(p.end)}</option>`
+  ).join('');
+}
+
+async function loadEmpHistory() {
+  const val = document.getElementById('emp-period-select').value;
+  if (!val) return;
+  const [start, end] = val.split('|');
+
+  const r = await fetch(`/api/report?start=${start}&end=${end}&employee_id=${currentUser.id}`);
+  const rows = await r.json();
+  const row = rows[0];
+
+  if (!row) {
+    document.getElementById('emp-period-summary').innerHTML = '';
+    document.getElementById('emp-type-row').innerHTML = '';
+    document.getElementById('emp-hist-entries').innerHTML = '<div class="hist-no-entries">No entries this period</div>';
+    return;
+  }
+
+  // summary cards
+  const totalHrs = (row.totalMins / 60).toFixed(1);
+  const regHrs = (row.totalRegular / 60).toFixed(1);
+  const otHrs = (row.totalOvertime / 60).toFixed(1);
+  document.getElementById('emp-period-summary').innerHTML = `
+    <div class="ps-card"><span class="ps-label">Total hrs</span><span class="ps-val red">${totalHrs}</span></div>
+    <div class="ps-card"><span class="ps-label">Regular</span><span class="ps-val">${regHrs}</span></div>
+    <div class="ps-card"><span class="ps-label">Overtime</span><span class="ps-val amber">${otHrs}</span></div>
+    <div class="ps-card"><span class="ps-label">Days</span><span class="ps-val">${row.days}</span></div>`;
+
+  // per-type chips
+  const typeStyles = { 'Class': 'htc-blue', 'Front Desk': 'htc-green', 'Private Class': 'htc-purple' };
+  document.getElementById('emp-type-row').innerHTML = WORK_TYPES.map(t => `
+    <div class="hist-type-chip ${typeStyles[t]}">
+      <span class="htc-label">${t}</span>
+      <span class="htc-val">${((row.byType[t] || 0) / 60).toFixed(1)}h</span>
+    </div>`).join('');
+
+  // entries list
+  const entries = row.entries.filter(e => e.clock_out);
+  if (!entries.length) {
+    document.getElementById('emp-hist-entries').innerHTML = '<div class="hist-no-entries">No completed entries this period</div>';
+    return;
+  }
+
+  // group by date
+  const byDate = {};
+  entries.forEach(e => {
+    const d = e.clock_in.slice(0, 10);
+    if (!byDate[d]) byDate[d] = [];
+    byDate[d].push(e);
+  });
+
+  const TC = { 'Class': 'type-class', 'Front Desk': 'type-desk', 'Private Class': 'type-private' };
+  document.getElementById('emp-hist-entries').innerHTML = Object.keys(byDate).sort().reverse().map(date => {
+    const dayEntries = byDate[date];
+    const dayMins = dayEntries.reduce((s, e) => s + e.durationMins, 0);
+    const dayLabel = new Date(date + 'T12:00:00').toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' });
+    const items = dayEntries.map(e => {
+      const t = e.work_type || 'Class';
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1.5px solid var(--border)">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="de-badge ${TC[t]}" style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;padding:2px 7px;border-radius:99px;">${t}</span>
+          <span class="hist-entry-times"><span class="log-in">${fmtTime(e.clock_in)}</span><span class="log-arrow" style="margin:0 4px;color:var(--border2)">→</span><span style="color:var(--muted)">${fmtTime(e.clock_out)}</span></span>
+        </div>
+        <span class="hist-entry-dur ${e.overtime_mins > 0 ? 'ot' : ''}">${fmtDur(e.durationMins)}${e.overtime_mins > 0 ? ' ⚡' : ''}</span>
+      </div>`;
+    }).join('');
+    return `<div class="hist-entry">
+      <div class="hist-entry-top">
+        <span class="hist-entry-date">${dayLabel}</span>
+        <span class="hist-entry-dur">${fmtDur(dayMins)}</span>
+      </div>
+      ${items}
     </div>`;
   }).join('');
 }
