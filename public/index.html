@@ -450,6 +450,7 @@ input, button, select { font-family: var(--sans); -webkit-appearance: none; appe
     <div class="admin-subbar" id="report-controls">
       <select id="period-select" onchange="loadReport()"><option value="">Loading…</option></select>
       <select id="emp-filter" onchange="loadReport()"><option value="">All employees</option></select>
+      <button class="btn-add" id="expand-all-btn" onclick="toggleExpandAll()">▾ Expand All</button>
     </div>
     <div class="admin-subbar" id="emp-controls" style="display:none">
       <button class="btn-add" onclick="openAddEmpModal()">+ Add Employee</button>
@@ -820,7 +821,7 @@ async function loadEmpFilter(){
   const r=await fetch('/api/employees'); const emps=await r.json();
   document.getElementById('emp-filter').innerHTML='<option value="">All employees</option>'+emps.filter(e=>!e.is_admin).map(e=>`<option value="${e.id}">${e.name}</option>`).join('');
 }
-async function loadReport(){
+async function loadReport(){ allExpanded=false; const eab=document.getElementById('expand-all-btn'); if(eab) eab.textContent='▾ Expand All';
   const val=document.getElementById('period-select').value; if(!val)return;
   currentPeriod=val;
   const [start,end]=val.split('|'); const ef=document.getElementById('emp-filter').value;
@@ -845,6 +846,9 @@ async function loadReport(){
       <span class="type-chip-label">${t}</span>
       <span class="type-chip-val">${(totByType[t]/60).toFixed(1)}h</span>
     </div>`).join('');
+
+  // remember which details are open before re-render
+  const openIds=new Set([...document.querySelectorAll('.detail-section.open')].map(el=>el.id));
 
   // render employee cards
   const [ps,pe]=val.split('|');
@@ -875,7 +879,7 @@ async function loadReport(){
       <div class="report-card-top">
         <div class="report-card-name"><span class="emp-avatar">${ini}</span>${row.employee.name}</div>
         <div class="report-card-actions">
-          <button class="toggle-btn" onclick="toggleDetail('rc-${row.employee.id}')">details</button>
+          <button class="toggle-btn" id="tb-${row.employee.id}" onclick="toggleDetail('rc-${row.employee.id}')">▾ details</button>
           <button class="action-btn add" onclick="openAddEntryModal(${row.employee.id},'${sn}','${ps}','${pe}')">+ Add</button>
         </div>
       </div>
@@ -885,11 +889,28 @@ async function loadReport(){
         <div class="hstat"><span class="hl">Total</span><span class="hv">${(row.totalMins/60).toFixed(1)}h</span></div>
         <div class="hstat"><span class="hl">Days</span><span class="hv">${row.days}</span></div>
       </div>
-      <div class="detail-section" id="rc-${row.employee.id}">${entries}</div>
+      <div class="detail-section ${openIds.has('rc-'+row.employee.id)?'open':''}" id="rc-${row.employee.id}">${entries}</div>
     </div>`;
   }).join('');
 }
-function toggleDetail(id){ document.getElementById(id).classList.toggle('open'); }
+let allExpanded=false;
+function toggleExpandAll(){
+  allExpanded=!allExpanded;
+  document.querySelectorAll('.detail-section').forEach(sec=>{
+    sec.classList.toggle('open',allExpanded);
+    const empId=sec.id.replace('rc-','');
+    const btn=document.getElementById('tb-'+empId);
+    if(btn) btn.textContent=allExpanded?'▴ details':'▾ details';
+  });
+  document.getElementById('expand-all-btn').textContent=allExpanded?'▴ Collapse All':'▾ Expand All';
+}
+function toggleDetail(id){
+  const sec=document.getElementById(id);
+  sec.classList.toggle('open');
+  const empId=id.replace('rc-','');
+  const btn=document.getElementById('tb-'+empId);
+  if(btn) btn.textContent=sec.classList.contains('open')?'▴ details':'▾ details';
+}
 
 // ── ENTRY MODALS ──
 function openAddEntryModal(empId,empName,ps,pe){
