@@ -645,6 +645,28 @@ input, button, select { font-family: var(--sans); -webkit-appearance: none; appe
   </div>
 </div>
 
+<!-- MODAL: EDIT SUBMISSION (admin) -->
+<div class="modal-overlay" id="modal-edit-sub">
+  <div class="modal"><span class="modal-handle"></span>
+    <h2>Edit Submission</h2>
+    <div class="modal-sub" id="edit-sub-label"></div>
+    <div class="modal-msg error" id="edit-sub-err"></div>
+    <div class="modal-msg success" id="edit-sub-ok"></div>
+    <div id="edit-sub-info" style="background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:1rem;font-size:13px;line-height:1.8"></div>
+    <div class="modal-field">
+      <label>Notes</label>
+      <textarea id="edit-sub-notes" placeholder="Notes…"></textarea>
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:1rem">
+      <button class="btn-cancel" style="flex:1;background:rgba(239,68,68,0.1);border-color:var(--accent);color:var(--accent)" onclick="confirmUnlockSub()">🔓 Unlock Period</button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeAllModals()">Cancel</button>
+      <button class="btn-primary" onclick="saveSubNotes()">Save Notes</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modal-del-emp">
   <div class="modal"><span class="modal-handle"></span>
     <h2>Remove Employee</h2><div class="modal-info" id="del-emp-info"></div>
@@ -1027,7 +1049,9 @@ async function loadReport(){ allExpanded=false; const eab=document.getElementByI
       <div class="hstat ${TYPE_HSTAT[t]}"><span class="hl">${t}</span><span class="hv">${((row.byType[t]||0)/60).toFixed(1)}h</span></div>`).join('');
 
     const subBadge = row.submission
-      ? `<span class="sub-badge submitted">✓ Submitted ${new Date(row.submission.submitted_at).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>`
+      ? `<span class="sub-badge submitted">✓ Submitted ${new Date(row.submission.submitted_at).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>
+         <button class="action-btn edit" onclick="openEditSubModal(${row.employee.id},'${esc(row.employee.name)}','${ps}','${pe}')">✏ Edit</button>
+         <button class="action-btn" style="border-color:#f59e0b;color:#f59e0b" onclick="quickUnlock(${row.employee.id},'${esc(row.employee.name)}','${ps}')">🔓 Reopen</button>`
       : `<span class="sub-badge pending">⏳ Pending</span>`;
     const subNotes = row.submission && row.submission.notes
       ? `<div style="font-size:12px;color:var(--muted);padding:8px 16px 0;font-style:italic">Notes: ${row.submission.notes}</div>` : '';
@@ -1163,6 +1187,62 @@ async function savePin(){
 }
 function openDelEmpModal(id,name){ closeAllModals(); editingEmpId=id; document.getElementById('del-emp-info').textContent=`Remove "${name}"? This permanently deletes their account and all time entries.`; document.getElementById('modal-del-emp').classList.add('open'); }
 async function confirmDelEmp(){ await fetch(`/api/employees/${editingEmpId}`,{method:'DELETE'}); closeAllModals(); await loadEmpFilter(); await loadEmpTable(); }
+
+// ── ADMIN: EDIT SUBMISSION ──
+let editSubEmpId=null, editSubPeriodStart=null, editSubPeriodEnd=null;
+
+async function quickUnlock(empId, empName, ps) {
+  if (!confirm(`Reopen the time card for ${empName}? They will be able to add entries and resubmit.`)) return;
+  const r = await fetch(`/api/submission/${empId}?period_start=${ps}`, { method: 'DELETE' });
+  if (!r.ok) { alert('Error reopening period.'); return; }
+  await loadReport();
+}
+
+async function openEditSubModal(empId, empName, ps, pe) {
+  closeAllModals();
+  editSubEmpId = empId;
+  editSubPeriodStart = ps;
+  editSubPeriodEnd = pe;
+  document.getElementById('edit-sub-err').textContent = '';
+  document.getElementById('edit-sub-ok').textContent = '';
+  document.getElementById('edit-sub-label').textContent = `Employee: ${empName}  ·  Period: ${fmt(ps)} – ${fmt(pe)}`;
+
+  // Load current submission
+  const r = await fetch(`/api/submission/${empId}?period_start=${ps}`);
+  const data = await r.json();
+  const sub = data.submission;
+
+  if (sub) {
+    const hrs = (sub.total_mins/60).toFixed(1);
+    document.getElementById('edit-sub-info').innerHTML =
+      `<span style="color:var(--muted)">Submitted:</span> <strong>${new Date(sub.submitted_at).toLocaleString()}</strong><br>
+       <span style="color:var(--muted)">Total hours:</span> <strong>${hrs} hrs</strong>`;
+    document.getElementById('edit-sub-notes').value = sub.notes || '';
+  }
+
+  document.getElementById('modal-edit-sub').classList.add('open');
+}
+
+async function saveSubNotes() {
+  const notes = document.getElementById('edit-sub-notes').value.trim();
+  const r = await fetch(`/api/submission/${editSubEmpId}`, {
+    method: 'PUT',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ period_start: editSubPeriodStart, notes })
+  });
+  const d = await r.json();
+  if (!r.ok) { document.getElementById('edit-sub-err').textContent = d.error; return; }
+  document.getElementById('edit-sub-ok').textContent = '✓ Notes saved!';
+  setTimeout(async () => { closeAllModals(); await loadReport(); }, 700);
+}
+
+async function confirmUnlockSub() {
+  if (!confirm(`Unlock this time card? The employee will be able to add entries and resubmit.`)) return;
+  const r = await fetch(`/api/submission/${editSubEmpId}?period_start=${editSubPeriodStart}`, { method: 'DELETE' });
+  if (!r.ok) { document.getElementById('edit-sub-err').textContent = 'Error unlocking.'; return; }
+  closeAllModals();
+  await loadReport();
+}
 
 // ── TIMECARD SUBMISSION ──
 let submitPeriod = null;
