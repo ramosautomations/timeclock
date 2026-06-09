@@ -281,29 +281,62 @@ input, button, select { font-family: var(--sans); -webkit-appearance: none; appe
 
 /* ── DESKTOP LAYOUT (768px+) ── */
 @media (min-width: 768px) {
-  #screen-login { background: var(--bg); }
-  .login-box { background: var(--surface); border: 1.5px solid var(--border); border-radius: 20px; padding: 2.5rem 2rem; max-width: 380px; }
-  #screen-employee .top-bar { padding: 1rem 2rem; }
-  .emp-nav { padding: 0 2rem; }
-  #epanel-clock .emp-body { padding: 2rem; max-width: 500px; }
-  #epanel-history .history-body { padding: 2rem; max-width: 700px; margin: 0 auto; }
-  .admin-header-top { padding: 1rem 2rem; }
-  .admin-nav { padding: 0 2rem; }
-  .admin-subbar { padding: 10px 2rem; }
-  .admin-body { padding: 1.5rem 2rem; max-width: 1100px; margin: 0 auto; }
-  .metrics-row { grid-template-columns: repeat(4, 1fr); }
+  /* Login */
+  .login-box { background: var(--surface); border: 1.5px solid var(--border); border-radius: 24px; padding: 3rem 2.5rem; max-width: 420px; }
+  .brand h1 { font-size: 28px; }
+  .pin-key { padding: 22px 10px; font-size: 22px; }
+
+  /* Employee */
+  #screen-employee .top-bar { padding: 1.1rem 2.5rem; }
+  .emp-nav { padding: 0 2.5rem; }
+  .emp-tab { font-size: 14px; padding: 13px 16px; }
+  #epanel-clock .emp-body { padding: 2.5rem; max-width: 560px; }
+  .live-time { font-size: 64px; }
+  .type-btn { padding: 16px 8px; font-size: 14px; }
+  .btn-clock { padding: 20px; font-size: 17px; }
+  #epanel-history .history-body { padding: 2.5rem; max-width: 780px; margin: 0 auto; }
+
+  /* Admin header */
+  .admin-header-top { padding: 1.1rem 2.5rem; }
+  .admin-title { font-size: 18px; }
+  .admin-nav { padding: 0 2.5rem; }
+  .admin-nav .nav-tab { font-size: 14px; padding: 13px 20px; }
+  .admin-subbar { padding: 12px 2.5rem; gap: 12px; }
+  .admin-subbar select { font-size: 14px; padding: 10px 32px 10px 14px; }
+  .btn-add { font-size: 14px; padding: 10px 20px; }
+  .btn-sm { font-size: 13px; padding: 8px 18px; }
+
+  /* Admin body */
+  .admin-body { padding: 2rem 2.5rem; max-width: 1200px; margin: 0 auto; }
+  .metrics-row { grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 1.5rem; }
+  .metric-card { padding: 1.25rem 1.5rem; }
+  .metric-val { font-size: 32px; }
+  .metric-label { font-size: 12px; }
+  .type-breakdown { gap: 12px; margin-bottom: 1.5rem; }
+  .type-chip { padding: 14px 20px; }
+  .type-chip-val { font-size: 22px; }
   .hours-grid.six { grid-template-columns: repeat(6, 1fr); }
-  .report-card { padding: 16px 20px; }
-  .detail-entry-card { padding: 10px 20px; }
-  .emp-card { padding: 16px 20px; }
-  .modal-overlay { align-items: center; padding: 1.5rem; }
-  .modal { border-radius: var(--radius) !important; padding-bottom: 1.5rem !important; max-width: 460px; }
+  .report-card { padding: 18px 22px; }
+  .report-card-name { font-size: 16px; }
+  .hstat .hv { font-size: 15px; }
+  .detail-entry-card { padding: 12px 22px; }
+  .emp-card { padding: 18px 22px; }
+  .emp-card-name { font-size: 15px; }
+
+  /* Modals */
+  .modal-overlay { align-items: center; padding: 2rem; }
+  .modal { border-radius: var(--radius) !important; padding: 2rem !important; max-width: 500px; }
   .modal-handle { display: none !important; }
+  .modal h2 { font-size: 20px; }
+  .modal-field input, .modal-field select { font-size: 15px; padding: 12px 16px; }
+  .btn-primary, .btn-cancel { font-size: 15px; padding: 14px; }
+  .toggle-row { padding: 14px 16px; }
+  .toggle-row-label { font-size: 15px; }
 }
 @media (min-width: 1100px) {
-  .admin-body { max-width: 1200px; }
-  .metrics-row { margin-bottom: 1.5rem; }
+  .admin-body { max-width: 1400px; }
   .type-breakdown { flex-wrap: nowrap; }
+  .metrics-row { grid-template-columns: repeat(4, 1fr); }
 }
 </style>
 </head>
@@ -469,10 +502,10 @@ input, button, select { font-family: var(--sans); -webkit-appearance: none; appe
     <h2>Add Employee</h2><div class="modal-msg error" id="add-emp-err"></div>
     <div class="modal-field"><label>Full name</label><input id="new-name" type="text" placeholder="Jane Smith"/></div>
     <div class="modal-field"><label>PIN (4–8 digits)</label><input id="new-pin" type="password" placeholder="••••" maxlength="8" inputmode="numeric"/></div>
-    <label class="toggle-row" onclick="document.getElementById('new-admin').click();event.preventDefault()">
+    <div class="toggle-row" onclick="var cb=document.getElementById('new-admin');cb.checked=!cb.checked;" style="cursor:pointer">
       <div><div class="toggle-row-label">Admin access</div><div class="toggle-row-sub">Can view reports and manage employees</div></div>
-      <div class="toggle-switch"><input type="checkbox" id="new-admin"/><div class="toggle-track"></div></div>
-    </label>
+      <div class="toggle-switch"><input type="checkbox" id="new-admin" onclick="event.stopPropagation();"/><div class="toggle-track" onclick="var cb=document.getElementById('new-admin');cb.checked=!cb.checked;event.stopPropagation();"></div></div>
+    </div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeAllModals()">Cancel</button>
       <button class="btn-primary" onclick="addEmployee()">Add</button>
@@ -485,10 +518,10 @@ input, button, select { font-family: var(--sans); -webkit-appearance: none; appe
     <h2>Edit Employee</h2>
     <div class="modal-msg error" id="edit-emp-err"></div><div class="modal-msg success" id="edit-emp-ok"></div>
     <div class="modal-field"><label>Full name</label><input id="edit-emp-name" type="text"/></div>
-    <label class="toggle-row" onclick="document.getElementById('edit-emp-admin').click();event.preventDefault()">
+    <div class="toggle-row" onclick="var cb=document.getElementById('edit-emp-admin');cb.checked=!cb.checked;" style="cursor:pointer">
       <div><div class="toggle-row-label">Admin access</div><div class="toggle-row-sub">Can view reports and manage employees</div></div>
-      <div class="toggle-switch"><input type="checkbox" id="edit-emp-admin"/><div class="toggle-track"></div></div>
-    </label>
+      <div class="toggle-switch"><input type="checkbox" id="edit-emp-admin" onclick="event.stopPropagation();"/><div class="toggle-track" onclick="var cb=document.getElementById('edit-emp-admin');cb.checked=!cb.checked;event.stopPropagation();"></div></div>
+    </div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeAllModals()">Cancel</button>
       <button class="btn-primary" onclick="saveEditEmp()">Save</button>
