@@ -347,9 +347,8 @@ input, button, select { font-family: var(--sans); -webkit-appearance: none; appe
   .hist-entry-dur { font-size: 14px; }
   .ps-card { padding: 14px 16px; }
   .ps-val { font-size: 22px; }
-  /* Employee list full width */
-  #panel-employees { width: 100% !important; }
-  #emp-list { width: 100% !important; display: block !important; min-width: 0; }
+  /* Employee list full width - matches report-cards structure */
+
 }
 @media (min-width: 1100px) {
   .admin-body { max-width: 1400px; }
@@ -463,7 +462,7 @@ input, button, select { font-family: var(--sans); -webkit-appearance: none; appe
       <div class="card-table" id="report-cards"></div>
     </div>
     <div class="admin-panel" id="panel-employees">
-      <div id="emp-list" style="width:100%"></div>
+      <div class="card-table" id="emp-list"></div>
     </div>
   </div>
 </div>
@@ -933,7 +932,7 @@ async function confirmDelEntry(){ await fetch(`/api/entries/${editingEntryId}`,{
 // ── EMPLOYEE MGMT ──
 async function loadEmpTable(){
   const r=await fetch('/api/employees'); const emps=await r.json();
-  document.getElementById('emp-list').innerHTML='<div class="card-table">'+emps.map(e=>{
+  document.getElementById('emp-list').innerHTML=emps.map(e=>{
     const sn=esc(e.name);
     return `<div class="emp-card">
       <span class="emp-avatar">${initials(e.name)}</span>
@@ -947,7 +946,7 @@ async function loadEmpTable(){
         <button class="action-btn del" onclick="openDelEmpModal(${e.id},'${sn}')">✕</button>
       </div>
     </div>`;
-  }).join('')+'</div>';
+  }).join('');
 }
 function openAddEmpModal(){ closeAllModals(); document.getElementById('add-emp-err').textContent=''; document.getElementById('new-name').value=''; document.getElementById('new-pin').value=''; document.getElementById('new-admin').checked=false; document.getElementById('modal-add-emp').classList.add('open'); }
 async function addEmployee(){
