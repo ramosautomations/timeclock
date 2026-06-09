@@ -278,6 +278,33 @@ input, button, select { font-family: var(--sans); -webkit-appearance: none; appe
 .modal-msg { font-size: 13px; margin-bottom: 0.75rem; min-height: 18px; font-weight: 500; }
 .modal-msg.error { color: var(--accent); } .modal-msg.success { color: #4ade80; }
 .modal-info { font-size: 13px; color: var(--muted); margin-bottom: 1.25rem; line-height: 1.6; background: var(--surface2); padding: 12px 14px; border-radius: var(--radius-sm); border: 1.5px solid var(--border); }
+
+/* ── DESKTOP LAYOUT (768px+) ── */
+@media (min-width: 768px) {
+  #screen-login { background: var(--bg); }
+  .login-box { background: var(--surface); border: 1.5px solid var(--border); border-radius: 20px; padding: 2.5rem 2rem; max-width: 380px; }
+  #screen-employee .top-bar { padding: 1rem 2rem; }
+  .emp-nav { padding: 0 2rem; }
+  #epanel-clock .emp-body { padding: 2rem; max-width: 500px; }
+  #epanel-history .history-body { padding: 2rem; max-width: 700px; margin: 0 auto; }
+  .admin-header-top { padding: 1rem 2rem; }
+  .admin-nav { padding: 0 2rem; }
+  .admin-subbar { padding: 10px 2rem; }
+  .admin-body { padding: 1.5rem 2rem; max-width: 1100px; margin: 0 auto; }
+  .metrics-row { grid-template-columns: repeat(4, 1fr); }
+  .hours-grid.six { grid-template-columns: repeat(6, 1fr); }
+  .report-card { padding: 16px 20px; }
+  .detail-entry-card { padding: 10px 20px; }
+  .emp-card { padding: 16px 20px; }
+  .modal-overlay { align-items: center; padding: 1.5rem; }
+  .modal { border-radius: var(--radius) !important; padding-bottom: 1.5rem !important; max-width: 460px; }
+  .modal-handle { display: none !important; }
+}
+@media (min-width: 1100px) {
+  .admin-body { max-width: 1200px; }
+  .metrics-row { margin-bottom: 1.5rem; }
+  .type-breakdown { flex-wrap: nowrap; }
+}
 </style>
 </head>
 <body>
@@ -910,45 +937,6 @@ function fmt(d){ return new Date(d+'T12:00:00').toLocaleDateString('en-US',{mont
 function initials(n){ return n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(); }
 function esc(s){ return s.replace(/'/g,"\\'"); }
 
-
-/* ── DESKTOP LAYOUT (768px+) ── */
-@media (min-width: 768px) {
-  /* Login centered card */
-  #screen-login { background: var(--bg); }
-  .login-box { background: var(--surface); border: 1.5px solid var(--border); border-radius: 20px; padding: 2.5rem 2rem; max-width: 380px; }
-
-  /* Employee: two-column layout */
-  #screen-employee { flex-direction: column; }
-  #screen-employee .top-bar { padding: 1rem 2rem; }
-  .emp-nav { padding: 0 2rem; }
-  .emp-panel.active { flex-direction: row; align-items: flex-start; }
-  #epanel-clock .emp-body { padding: 2rem; max-width: 480px; min-width: 380px; border-right: 1.5px solid var(--border); min-height: calc(100dvh - 110px); }
-  #epanel-history .history-body { padding: 2rem; max-width: 700px; margin: 0 auto; }
-
-  /* Admin: wider comfortable layout */
-  .admin-header-top { padding: 1rem 2rem; }
-  .admin-nav { padding: 0 2rem; }
-  .admin-subbar { padding: 10px 2rem; }
-  .admin-body { padding: 1.5rem 2rem; max-width: 1100px; margin: 0 auto; }
-  .metrics-row { grid-template-columns: repeat(4, 1fr); }
-  .report-card { padding: 16px 20px; }
-  .report-card-top { margin-bottom: 12px; }
-  .hours-grid.six { grid-template-columns: repeat(6, 1fr); }
-  .detail-entry-card { padding: 10px 20px; }
-  .emp-card { padding: 16px 20px; }
-
-  /* Modals centered, not bottom-sheet */
-  .modal-overlay { align-items: center; padding: 1.5rem; }
-  .modal { border-radius: var(--radius) !important; padding-bottom: 1.5rem !important; max-width: 460px; }
-  .modal-handle { display: none !important; }
-}
-
-@media (min-width: 1100px) {
-  /* Admin: side-by-side metrics + cards */
-  .admin-body { max-width: 1200px; }
-  .metrics-row { margin-bottom: 1.5rem; }
-  .type-breakdown { flex-wrap: nowrap; }
-}
 
 document.addEventListener('DOMContentLoaded', setupPin);
 </script>
