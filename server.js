@@ -80,7 +80,7 @@ function getPayPeriods(count = 10) {
 function calcOvertimeForPeriod(employeeId, periodStart, periodEnd) {
   const entries = db.prepare(`
     SELECT * FROM time_entries
-    WHERE employee_id = ? AND date(clock_in) >= ? AND date(clock_in) <= ? AND clock_out IS NOT NULL
+    WHERE employee_id = ? AND clock_in >= ? AND clock_in < date(?, '+1 day') AND clock_out IS NOT NULL
     ORDER BY clock_in
   `).all(employeeId, periodStart, periodEnd);
 
@@ -194,7 +194,7 @@ app.get('/api/report', (req, res) => {
   const report = emps.map(emp => {
     const entries = db.prepare(`
       SELECT * FROM time_entries
-      WHERE employee_id = ? AND date(clock_in) >= ? AND date(clock_in) <= ?
+      WHERE employee_id = ? AND clock_in >= ? AND clock_in < date(?, '+1 day')
       ORDER BY clock_in
     `).all(emp.id, start, end);
 
@@ -237,7 +237,7 @@ app.get('/api/entries/:employeeId', (req, res) => {
   const { start, end } = req.query;
   let sql = `SELECT * FROM time_entries WHERE employee_id = ?`;
   const params = [req.params.employeeId];
-  if (start && end) { sql += ` AND date(clock_in) >= ? AND date(clock_in) <= ?`; params.push(start, end); }
+  if (start && end) { sql += ` AND clock_in >= ? AND clock_in < date(?, '+1 day')`; params.push(start, end); }
   sql += ` ORDER BY clock_in DESC`;
   res.json(db.prepare(sql).all(...params));
 });

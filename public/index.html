@@ -766,7 +766,7 @@ async function loadEmpHistory() {
   // group by date
   const byDate = {};
   entries.forEach(e => {
-    const d = e.clock_in.slice(0, 10);
+    const d = new Date(e.clock_in).toLocaleDateString('en-CA'); // YYYY-MM-DD in local time
     if (!byDate[d]) byDate[d] = [];
     byDate[d].push(e);
   });
