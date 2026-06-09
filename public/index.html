@@ -603,6 +603,35 @@ const TC_CHIP = { 'Class':'tc-class','Front Desk':'tc-desk','Private Class':'tc-
 let currentUser=null, pinBuffer='', clockedIn=false, clockInTime=null, selectedType=null;
 let durationTimer=null, clockTick=null, editingEmpId=null, editingEntryId=null, addEntryEmpId=null;
 let reportData=[], currentPeriod='';
+let todayLogTimer=null;
+
+// ── AUTO LOGOUT (5 min inactivity) ──
+let inactivityTimer=null;
+const INACTIVITY_MS = 5 * 60 * 1000; // 5 minutes
+
+function resetInactivityTimer() {
+  if (!currentUser) return;
+  clearTimeout(inactivityTimer);
+  inactivityTimer = setTimeout(() => {
+    if (currentUser) {
+      logout();
+      // Show a brief message on the PIN screen
+      document.getElementById('pin-error').textContent = 'Signed out due to inactivity.';
+      setTimeout(() => { document.getElementById('pin-error').textContent = ''; }, 4000);
+    }
+  }, INACTIVITY_MS);
+}
+
+function startInactivityTimer() {
+  ['touchstart','touchend','mousedown','keydown','scroll','click'].forEach(evt =>
+    document.addEventListener(evt, resetInactivityTimer, { passive: true })
+  );
+  resetInactivityTimer();
+}
+
+function stopInactivityTimer() {
+  clearTimeout(inactivityTimer);
+}
 
 // ── PIN ──
 function setupPin(){
@@ -625,13 +654,13 @@ async function tryLogin(){
     const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pin:pinBuffer})});
     if(!r.ok){ [0,1,2,3].forEach(i=>document.getElementById('dot-'+i).classList.add('error')); document.getElementById('pin-error').textContent='Invalid PIN.'; setTimeout(()=>{pinBuffer='';updateDots();document.getElementById('pin-error').textContent='';},1000); return; }
     const u=await r.json(); currentUser=u; pinBuffer=''; updateDots();
+    startInactivityTimer();
     if(u.is_admin) showAdmin(); else showEmployee();
   }catch(e){ document.getElementById('pin-error').textContent='Connection error.'; pinBuffer=''; updateDots(); }
 }
-function logout(){ currentUser=null; selectedType=null; pinBuffer=''; updateDots(); if(durationTimer)clearInterval(durationTimer); if(clockTick)clearInterval(clockTick); if(todayLogTimer)clearInterval(todayLogTimer); showScreen('login'); }
+function logout(){ currentUser=null; selectedType=null; pinBuffer=''; updateDots(); if(durationTimer)clearInterval(durationTimer); if(clockTick)clearInterval(clockTick); if(todayLogTimer)clearInterval(todayLogTimer); stopInactivityTimer(); showScreen('login'); }
 
 // ── EMPLOYEE ──
-let todayLogTimer=null;
 async function showEmployee(){
   showScreen('employee');
   document.getElementById('emp-name-display').textContent=currentUser.name;
