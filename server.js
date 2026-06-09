@@ -177,10 +177,17 @@ app.post('/api/clockout', (req, res) => {
   res.json(db.prepare('SELECT * FROM time_entries WHERE id = ?').get(open.id));
 });
 
-// Today's log — accepts local date from client to avoid UTC mismatch
+// Today's log — client passes local YYYY-MM-DD date to avoid UTC mismatch
 app.get('/api/today/:employeeId', (req, res) => {
   const localDate = req.query.date || new Date().toISOString().slice(0, 10);
-  res.json(db.prepare(`SELECT * FROM time_entries WHERE employee_id = ? AND substr(clock_in, 1, 10) = ? ORDER BY clock_in`).all(req.params.employeeId, localDate));
+  // Compare ISO range: clock_in >= "2026-06-08" AND clock_in < "2026-06-09"
+  res.json(db.prepare(`
+    SELECT * FROM time_entries
+    WHERE employee_id = ?
+      AND clock_in >= ?
+      AND clock_in < date(?, '+1 day')
+    ORDER BY clock_in
+  `).all(req.params.employeeId, localDate, localDate));
 });
 
 app.get('/api/payperiods', (req, res) => res.json(getPayPeriods(12)));

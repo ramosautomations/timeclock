@@ -608,9 +608,10 @@ async function tryLogin(){
     if(u.is_admin) showAdmin(); else showEmployee();
   }catch(e){ document.getElementById('pin-error').textContent='Connection error.'; pinBuffer=''; updateDots(); }
 }
-function logout(){ currentUser=null; selectedType=null; pinBuffer=''; updateDots(); if(durationTimer)clearInterval(durationTimer); if(clockTick)clearInterval(clockTick); showScreen('login'); }
+function logout(){ currentUser=null; selectedType=null; pinBuffer=''; updateDots(); if(durationTimer)clearInterval(durationTimer); if(clockTick)clearInterval(clockTick); if(todayLogTimer)clearInterval(todayLogTimer); showScreen('login'); }
 
 // ── EMPLOYEE ──
+let todayLogTimer=null;
 async function showEmployee(){
   showScreen('employee');
   document.getElementById('emp-name-display').textContent=currentUser.name;
@@ -618,6 +619,8 @@ async function showEmployee(){
   startClock(); await refreshStatus(); await loadTodayLog();
   await loadEmpPeriods();
   switchEmpTab('clock');
+  if(todayLogTimer) clearInterval(todayLogTimer);
+  todayLogTimer=setInterval(loadTodayLog, 30000); // refresh every 30s
 }
 function startClock(){
   if(clockTick)clearInterval(clockTick);
