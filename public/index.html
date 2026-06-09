@@ -290,11 +290,15 @@ input, button, select { font-family: var(--sans); -webkit-appearance: none; appe
   #screen-employee .top-bar { padding: 1.1rem 2.5rem; }
   .emp-nav { padding: 0 2.5rem; }
   .emp-tab { font-size: 14px; padding: 13px 16px; }
-  #epanel-clock .emp-body { padding: 2.5rem; max-width: 560px; }
+  #epanel-clock .emp-body { padding: 2.5rem; max-width: 1200px; width: 100%; align-items: stretch; }
+  #epanel-clock .clock-hero { text-align: center; }
+  #epanel-clock .type-btns { max-width: 600px; margin: 0 auto; }
+  #epanel-clock .btn-clock { max-width: 600px; margin: 0 auto; }
+  #epanel-clock .status-pill { display: inline-flex; }
   .live-time { font-size: 64px; }
   .type-btn { padding: 16px 8px; font-size: 14px; }
   .btn-clock { padding: 20px; font-size: 17px; }
-  #epanel-history .history-body { padding: 2.5rem; max-width: 780px; margin: 0 auto; }
+  #epanel-history .history-body { padding: 2.5rem; max-width: 1200px; margin: 0 auto; }
 
   /* Admin header */
   .admin-header-top { padding: 1.1rem 2.5rem; }
@@ -335,6 +339,8 @@ input, button, select { font-family: var(--sans); -webkit-appearance: none; appe
 }
 @media (min-width: 1100px) {
   .admin-body { max-width: 1400px; }
+  #epanel-clock .emp-body { max-width: 1400px; }
+  #epanel-history .history-body { max-width: 1400px; }
   .type-breakdown { flex-wrap: nowrap; }
   .metrics-row { grid-template-columns: repeat(4, 1fr); }
 }
