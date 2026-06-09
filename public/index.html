@@ -397,6 +397,9 @@ input, button, select { font-family: var(--sans); -webkit-appearance: none; appe
   .ps-card { padding: 14px 16px; }
   .ps-val { font-size: 22px; }
   /* Employee list full width - matches report-cards structure */
+  /* Submitted row buttons - inline on desktop */
+  .sub-actions-row { flex-direction: row; align-items: center; gap: 8px; }
+  .report-card-top { flex-wrap: nowrap; }
 
 }
 @media (min-width: 1100px) {
@@ -1033,14 +1036,14 @@ async function loadReport(){ allExpanded=false; const eab=document.getElementByI
       const mins=e.durationMins; const t=e.work_type||'Class';
       return `<div class="detail-entry-card">
         <div class="de-left">
-          <div class="de-meta"><span class="de-date">${e.clock_in.slice(0,10)}</span><span class="de-badge ${TYPE_BADGE[t]}">${t}</span></div>
+          <div class="de-meta"><span class="de-date">${new Date(e.clock_in).toLocaleDateString('en-CA')}</span><span class="de-badge ${TYPE_BADGE[t]}">${t}</span></div>
           <div class="de-times"><span class="de-in">${fmtTime(e.clock_in)}</span><span class="log-arrow" style="margin:0 4px">→</span><span class="de-out">${fmtTime(e.clock_out)}</span></div>
         </div>
         <div style="display:flex;align-items:center;gap:8px">
           <div class="de-dur">${fmtDur(mins)}${e.overtime_mins>0?' ⚡':''}</div>
           <div class="de-actions">
             <button class="action-btn edit" onclick="openEditEntryModal(${e.id},'${e.clock_in}','${e.clock_out||''}','${sn}','${esc(t)}')">✏</button>
-            <button class="action-btn del" onclick="openDelEntryModal(${e.id},'${e.clock_in.slice(0,10)}','${sn}')">✕</button>
+            <button class="action-btn del" onclick="openDelEntryModal(${e.id},'${new Date(e.clock_in).toLocaleDateString('en-CA')}','${sn}')">✕</button>
           </div>
         </div>
       </div>`;
@@ -1106,7 +1109,7 @@ function openAddEntryModal(empId,empName,ps,pe){
   document.getElementById('add-entry-sub').textContent='Employee: '+empName;
   document.getElementById('add-entry-err').textContent='';
   document.getElementById('ae-type').value='Class';
-  document.getElementById('ae-date').value=new Date().toISOString().slice(0,10);
+  document.getElementById('ae-date').value=new Date().toLocaleDateString('en-CA');
   document.getElementById('ae-date').min=ps; document.getElementById('ae-date').max=pe;
   document.getElementById('ae-in').value=''; document.getElementById('ae-out').value='';
   document.getElementById('modal-add-entry').classList.add('open');
@@ -1123,8 +1126,8 @@ function openEditEntryModal(id,clock_in,clock_out,empName,workType){
   document.getElementById('edit-entry-sub').textContent='Employee: '+empName;
   document.getElementById('edit-entry-err').textContent='';
   document.getElementById('ee-type').value=workType||'Class';
-  document.getElementById('ee-date').value=clock_in.slice(0,10);
-  document.getElementById('ee-in').value=clock_in.slice(11,16);
+  document.getElementById('ee-date').value=new Date(clock_in).toLocaleDateString('en-CA');
+  const eeInDate=new Date(clock_in); document.getElementById('ee-in').value=`${String(eeInDate.getHours()).padStart(2,'0')}:${String(eeInDate.getMinutes()).padStart(2,'0')}`;
   document.getElementById('ee-out').value=clock_out?clock_out.slice(11,16):'';
   document.getElementById('modal-edit-entry').classList.add('open');
 }
