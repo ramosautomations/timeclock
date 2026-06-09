@@ -463,6 +463,22 @@ input, button, select { font-family: var(--sans); -webkit-appearance: none; appe
 
       <button class="btn-clock clock-in" id="clock-btn" onclick="toggleClock()">Select a work type</button>
 
+      <!-- Reminder banner — shown Wednesday before pay period ends -->
+      <div class="reminder-banner" id="reminder-banner">
+        <span class="reminder-icon">⚠️</span>
+        <div class="reminder-text"><strong>Time Card Due Tomorrow!</strong>Pay period ends Thursday. Please review and submit your time card today.</div>
+      </div>
+
+      <!-- Locked banner — shown after submission -->
+      <div class="locked-banner" id="locked-banner" style="display:none">
+        <div class="lock-icon">🔒</div>
+        <div class="lock-text">Time Card Submitted</div>
+        <div class="lock-sub" id="locked-sub">This pay period is locked.</div>
+      </div>
+
+      <!-- Submit button -->
+      <button class="btn-submit" id="submit-btn" style="display:none" onclick="openSubmitModal()">📋 Submit Time Card</button>
+
       <div class="today-section">
         <div class="section-label">Today's entries</div>
         <div class="log-list" id="log-list"></div>
@@ -731,17 +747,25 @@ async function checkSubmissionStatus() {
   const submitBtn = document.getElementById('submit-btn');
 
   if (data.submitted) {
-    // Period is locked
+    // Period is locked — show locked state, hide submit
     reminderBanner.classList.remove('show');
     lockedBanner.style.display = 'block';
     submitBtn.style.display = 'none';
     const sub = data.submission;
     const hrs = (sub.total_mins/60).toFixed(1);
-    document.getElementById('locked-sub').textContent = `Submitted on ${new Date(sub.submitted_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})} · ${hrs} hrs`;
+    document.getElementById('locked-sub').textContent =
+      `Submitted ${new Date(sub.submitted_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})} · ${hrs} hrs`;
+    // Also disable clock-in
+    const clockBtn = document.getElementById('clock-btn');
+    if (clockBtn && !clockedIn) {
+      clockBtn.disabled = true;
+      clockBtn.textContent = 'Period Locked';
+    }
   } else {
+    // Not submitted — always show submit button
     lockedBanner.style.display = 'none';
     submitBtn.style.display = 'block';
-    // Show reminder banner if it's Wednesday (day before last day)
+    // Show reminder banner on Wednesday before last day
     if (currentUser.reminderDay) {
       reminderBanner.classList.add('show');
     } else {
