@@ -691,7 +691,9 @@ async function toggleClock(){
 }
 async function loadTodayLog(){
   const localDate=new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD in local time
-  const r=await fetch('/api/today/'+currentUser.id+'?date='+localDate); const entries=await r.json();
+  const r=await fetch('/api/today/'+currentUser.id); const all=await r.json();
+  // Filter to local date client-side to avoid any UTC mismatch
+  const entries=all.filter(e=>new Date(e.clock_in).toLocaleDateString('en-CA')===localDate);
   const list=document.getElementById('log-list');
   if(!entries.length){ list.innerHTML='<div class="empty-log">No entries yet today</div>'; return; }
   list.innerHTML=entries.map(e=>{
