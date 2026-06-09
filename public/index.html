@@ -39,6 +39,7 @@
   --radius: 14px; --radius-sm: 10px;
   --mono: 'DM Mono', monospace; --sans: 'Inter', sans-serif;
   --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-t: env(safe-area-inset-top, 0px);
 }
 html, body { height: 100%; }
 body { font-family: var(--sans); background: var(--bg); color: var(--text); overscroll-behavior: none; }
@@ -47,7 +48,7 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text); over
 input, button, select { font-family: var(--sans); -webkit-appearance: none; appearance: none; }
 
 /* ── LOGIN ── */
-#screen-login { align-items: center; justify-content: center; padding: 1.5rem; }
+#screen-login { align-items: center; justify-content: center; padding: 1.5rem; padding-top: calc(1.5rem + var(--safe-t)); }
 .login-box { width: 100%; max-width: 340px; }
 .brand { text-align: center; margin-bottom: 2rem; }
 .brand-icon { width: 60px; height: 60px; background: var(--accent-dim); border: 1.5px solid var(--accent); border-radius: 18px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
@@ -68,7 +69,7 @@ input, button, select { font-family: var(--sans); -webkit-appearance: none; appe
 .pin-error { text-align: center; font-size: 13px; color: var(--accent); margin-top: 1rem; min-height: 20px; font-weight: 500; }
 
 /* ── TOP BAR ── */
-.top-bar { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; border-bottom: 1.5px solid var(--border); background: var(--surface); flex-shrink: 0; }
+.top-bar { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; padding-top: calc(1rem + var(--safe-t)); border-bottom: 1.5px solid var(--border); background: var(--surface); flex-shrink: 0; }
 .top-bar-title { font-size: 15px; font-weight: 600; }
 .top-bar-title span { color: var(--muted); font-weight: 400; }
 .btn-sm { background: none; border: 1.5px solid var(--border); color: var(--muted); font-size: 12px; font-weight: 500; padding: 7px 14px; border-radius: 99px; cursor: pointer; touch-action: manipulation; }
@@ -132,7 +133,7 @@ input, button, select { font-family: var(--sans); -webkit-appearance: none; appe
 
 /* ── ADMIN ── */
 #screen-admin { flex-direction: column; }
-.admin-header { background: var(--surface); border-bottom: 1.5px solid var(--border); flex-shrink: 0; }
+.admin-header { background: var(--surface); border-bottom: 1.5px solid var(--border); flex-shrink: 0; padding-top: var(--safe-t); }
 .admin-header-top { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; gap: 10px; }
 .admin-title { font-size: 16px; font-weight: 700; }
 .admin-nav { display: flex; border-top: 1.5px solid var(--border); }
