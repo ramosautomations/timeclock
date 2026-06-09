@@ -593,7 +593,8 @@ async function toggleClock(){
   finally{ btn.disabled=false; btn.style.opacity=''; }
 }
 async function loadTodayLog(){
-  const r=await fetch('/api/today/'+currentUser.id); const entries=await r.json();
+  const localDate=new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD in local time
+  const r=await fetch('/api/today/'+currentUser.id+'?date='+localDate); const entries=await r.json();
   const list=document.getElementById('log-list');
   if(!entries.length){ list.innerHTML='<div class="empty-log">No entries yet today</div>'; return; }
   list.innerHTML=entries.map(e=>{
