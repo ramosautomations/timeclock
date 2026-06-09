@@ -47,6 +47,33 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text); over
 .screen.active { display: flex; }
 input, button, select { font-family: var(--sans); -webkit-appearance: none; appearance: none; }
 
+/* ── REMINDER BANNER ── */
+.reminder-banner { display:none; background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(245,158,11,0.08)); border: 1.5px solid var(--amber); border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom: 1.25rem; width: 100%; }
+.reminder-banner.show { display: flex; align-items: center; gap: 10px; }
+.reminder-icon { font-size: 20px; flex-shrink: 0; }
+.reminder-text { font-size: 13px; color: var(--amber); font-weight: 500; line-height: 1.4; }
+.reminder-text strong { display: block; font-size: 14px; margin-bottom: 2px; }
+
+/* ── SUBMIT BUTTON ── */
+.btn-submit { width: 100%; padding: 15px; border-radius: var(--radius); font-size: 15px; font-weight: 700; cursor: pointer; border: 1.5px solid var(--amber); background: var(--amber-dim); color: var(--amber); touch-action: manipulation; transition: all 0.15s; margin-top: 12px; }
+.btn-submit:hover { background: rgba(245,158,11,0.25); }
+.btn-submit:active { transform: scale(0.98); }
+
+/* ── LOCKED STATE ── */
+.locked-banner { background: rgba(239,68,68,0.08); border: 1.5px solid var(--accent); border-radius: var(--radius-sm); padding: 12px 16px; width: 100%; text-align: center; margin-bottom: 1rem; }
+.locked-banner .lock-icon { font-size: 22px; margin-bottom: 4px; }
+.locked-banner .lock-text { font-size: 13px; color: var(--accent); font-weight: 600; }
+.locked-banner .lock-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+/* ── SUBMISSION BADGE in admin ── */
+.sub-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 99px; }
+.sub-badge.submitted { background: rgba(34,197,94,0.12); color: #22c55e; border: 1px solid #22c55e; }
+.sub-badge.pending { background: var(--amber-dim); color: var(--amber); border: 1px solid var(--amber); }
+
+/* ── NOTES MODAL ── */
+.modal-field textarea { width: 100%; background: var(--surface2); border: 1.5px solid var(--border2); color: var(--text); font-size: 14px; font-family: var(--sans); padding: 10px 14px; border-radius: var(--radius-sm); resize: vertical; min-height: 100px; }
+.modal-field textarea:focus { outline: none; border-color: var(--amber); }
+
 /* ── LOGIN ── */
 #screen-login { align-items: center; justify-content: center; padding: 1.5rem; padding-top: calc(1.5rem + var(--safe-t)); }
 .login-box { width: 100%; max-width: 340px; }
@@ -583,6 +610,25 @@ input, button, select { font-family: var(--sans); -webkit-appearance: none; appe
   </div>
 </div>
 
+<!-- MODAL: SUBMIT TIME CARD -->
+<div class="modal-overlay" id="modal-submit">
+  <div class="modal"><span class="modal-handle"></span>
+    <h2>Submit Time Card</h2>
+    <div class="modal-sub" id="submit-period-label"></div>
+    <div class="modal-msg error" id="submit-err"></div>
+    <div id="submit-summary" style="background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:1rem;font-size:13px;line-height:1.8"></div>
+    <div class="modal-field">
+      <label>Notes (optional)</label>
+      <textarea id="submit-notes" placeholder="Any notes for this pay period…"></textarea>
+    </div>
+    <div class="modal-info" style="color:var(--amber);border-color:var(--amber);background:rgba(245,158,11,0.08)">⚠️ Once submitted this pay period will be locked. You cannot add or edit entries.</div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeAllModals()">Cancel</button>
+      <button class="btn-primary" style="background:var(--amber);border:none" onclick="confirmSubmit()">Submit Time Card</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modal-del-emp">
   <div class="modal"><span class="modal-handle"></span>
     <h2>Remove Employee</h2><div class="modal-info" id="del-emp-info"></div>
@@ -655,7 +701,8 @@ async function tryLogin(){
     if(!r.ok){ [0,1,2,3].forEach(i=>document.getElementById('dot-'+i).classList.add('error')); document.getElementById('pin-error').textContent='Invalid PIN.'; setTimeout(()=>{pinBuffer='';updateDots();document.getElementById('pin-error').textContent='';},1000); return; }
     const u=await r.json(); currentUser=u; pinBuffer=''; updateDots();
     startInactivityTimer();
-    if(u.is_admin) showAdmin(); else showEmployee();
+    if(u.is_admin) showAdmin();
+    else { currentUser.reminderDay=u.reminderDay; currentUser.currentPeriod=u.currentPeriod; showEmployee(); }
   }catch(e){ document.getElementById('pin-error').textContent='Connection error.'; pinBuffer=''; updateDots(); }
 }
 function logout(){ currentUser=null; selectedType=null; pinBuffer=''; updateDots(); if(durationTimer)clearInterval(durationTimer); if(clockTick)clearInterval(clockTick); if(todayLogTimer)clearInterval(todayLogTimer); stopInactivityTimer(); showScreen('login'); }
@@ -667,9 +714,40 @@ async function showEmployee(){
   selectedType=null; updateTypeUI();
   startClock(); await refreshStatus(); await loadTodayLog();
   await loadEmpPeriods();
+  await checkSubmissionStatus();
   switchEmpTab('clock');
   if(todayLogTimer) clearInterval(todayLogTimer);
-  todayLogTimer=setInterval(loadTodayLog, 30000); // refresh every 30s
+  todayLogTimer=setInterval(loadTodayLog, 30000);
+}
+
+async function checkSubmissionStatus() {
+  const period = currentUser.currentPeriod;
+  if (!period) return;
+  const r = await fetch(`/api/submission/${currentUser.id}?period_start=${period.start}`);
+  const data = await r.json();
+
+  const reminderBanner = document.getElementById('reminder-banner');
+  const lockedBanner = document.getElementById('locked-banner');
+  const submitBtn = document.getElementById('submit-btn');
+
+  if (data.submitted) {
+    // Period is locked
+    reminderBanner.classList.remove('show');
+    lockedBanner.style.display = 'block';
+    submitBtn.style.display = 'none';
+    const sub = data.submission;
+    const hrs = (sub.total_mins/60).toFixed(1);
+    document.getElementById('locked-sub').textContent = `Submitted on ${new Date(sub.submitted_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})} · ${hrs} hrs`;
+  } else {
+    lockedBanner.style.display = 'none';
+    submitBtn.style.display = 'block';
+    // Show reminder banner if it's Wednesday (day before last day)
+    if (currentUser.reminderDay) {
+      reminderBanner.classList.add('show');
+    } else {
+      reminderBanner.classList.remove('show');
+    }
+  }
 }
 function startClock(){
   if(clockTick)clearInterval(clockTick);
@@ -924,14 +1002,21 @@ async function loadReport(){ allExpanded=false; const eab=document.getElementByI
     const typeStats=WORK_TYPES.map(t=>`
       <div class="hstat ${TYPE_HSTAT[t]}"><span class="hl">${t}</span><span class="hv">${((row.byType[t]||0)/60).toFixed(1)}h</span></div>`).join('');
 
+    const subBadge = row.submission
+      ? `<span class="sub-badge submitted">✓ Submitted ${new Date(row.submission.submitted_at).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>`
+      : `<span class="sub-badge pending">⏳ Pending</span>`;
+    const subNotes = row.submission && row.submission.notes
+      ? `<div style="font-size:12px;color:var(--muted);padding:8px 16px 0;font-style:italic">Notes: ${row.submission.notes}</div>` : '';
     return `<div class="report-card">
       <div class="report-card-top">
         <div class="report-card-name"><span class="emp-avatar">${ini}</span>${row.employee.name}</div>
-        <div class="report-card-actions">
+        <div class="report-card-actions" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          ${subBadge}
           <button class="toggle-btn" id="tb-${row.employee.id}" onclick="toggleDetail('rc-${row.employee.id}')">▾ details</button>
           <button class="action-btn add" onclick="openAddEntryModal(${row.employee.id},'${sn}','${ps}','${pe}')">+ Add</button>
         </div>
       </div>
+      ${subNotes}
       <div class="hours-grid six">
         ${typeStats}
         <div class="hstat hv-amber"><span class="hl">OT</span><span class="hv">${(row.totalOvertime/60).toFixed(1)}h</span></div>
@@ -1054,6 +1139,63 @@ async function savePin(){
 }
 function openDelEmpModal(id,name){ closeAllModals(); editingEmpId=id; document.getElementById('del-emp-info').textContent=`Remove "${name}"? This permanently deletes their account and all time entries.`; document.getElementById('modal-del-emp').classList.add('open'); }
 async function confirmDelEmp(){ await fetch(`/api/employees/${editingEmpId}`,{method:'DELETE'}); closeAllModals(); await loadEmpFilter(); await loadEmpTable(); }
+
+// ── TIMECARD SUBMISSION ──
+let submitPeriod = null;
+
+async function openSubmitModal() {
+  closeAllModals();
+  const period = currentUser.currentPeriod;
+  if (!period) return;
+  submitPeriod = period;
+
+  // Build summary from today's data
+  const r = await fetch(`/api/report?start=${period.start}&end=${period.end}&employee_id=${currentUser.id}`);
+  const rows = await r.json();
+  const row = rows[0];
+
+  document.getElementById('submit-period-label').textContent = `Period: ${fmt(period.start)} – ${fmt(period.end)}`;
+  document.getElementById('submit-err').textContent = '';
+  document.getElementById('submit-notes').value = '';
+
+  if (row) {
+    const WORK_TYPES_LOCAL = ['Class', 'Front Desk', 'Private Class'];
+    const typeLines = WORK_TYPES_LOCAL.map(t =>
+      `<span style="color:var(--muted)">${t}:</span> <strong>${((row.byType[t]||0)/60).toFixed(1)} hrs</strong>`
+    ).join(' &nbsp;·&nbsp; ');
+    document.getElementById('submit-summary').innerHTML =
+      `<div style="margin-bottom:6px"><span style="color:var(--muted)">Total:</span> <strong style="color:var(--accent);font-size:16px">${(row.totalMins/60).toFixed(1)} hrs</strong> &nbsp;·&nbsp; <span style="color:var(--muted)">Days:</span> <strong>${row.days}</strong></div>
+       <div style="font-size:12px">${typeLines}</div>`;
+  } else {
+    document.getElementById('submit-summary').innerHTML = '<span style="color:var(--muted)">No entries this period.</span>';
+  }
+
+  document.getElementById('modal-submit').classList.add('open');
+}
+
+async function confirmSubmit() {
+  if (!submitPeriod) return;
+  const notes = document.getElementById('submit-notes').value.trim();
+  const btn = document.querySelector('#modal-submit .btn-primary');
+  btn.disabled = true; btn.textContent = 'Submitting…';
+
+  try {
+    const r = await fetch('/api/submit', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ employee_id: currentUser.id, period_start: submitPeriod.start, period_end: submitPeriod.end, notes })
+    });
+    const d = await r.json();
+    if (!r.ok) { document.getElementById('submit-err').textContent = d.error; return; }
+    closeAllModals();
+    await checkSubmissionStatus();
+    updateTypeUI(); // disable clock-in
+  } catch(e) {
+    document.getElementById('submit-err').textContent = 'Network error. Try again.';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Submit Time Card';
+  }
+}
 
 // ── HELPERS ──
 function closeAllModals(){ document.querySelectorAll('.modal-overlay').forEach(m=>m.classList.remove('open')); }
