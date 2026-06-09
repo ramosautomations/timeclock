@@ -338,6 +338,25 @@ app.get('/api/report', (req, res) => {
   res.json(report);
 });
 
+// ── ADMIN: UNLOCK / EDIT SUBMISSION ──
+
+// Delete submission (unlock the period)
+app.delete('/api/submission/:employeeId', (req, res) => {
+  const { period_start } = req.query;
+  if (!period_start) return res.status(400).json({ error: 'period_start required' });
+  const result = db.prepare('DELETE FROM timecard_submissions WHERE employee_id = ? AND period_start = ?').run(req.params.employeeId, period_start);
+  console.log(`Unlock: emp=${req.params.employeeId} period=${period_start} rows=${result.changes}`);
+  res.json({ ok: true, deleted: result.changes });
+});
+
+// Edit submission notes
+app.put('/api/submission/:employeeId', (req, res) => {
+  const { period_start, notes } = req.body;
+  db.prepare('UPDATE timecard_submissions SET notes = ? WHERE employee_id = ? AND period_start = ?').run(notes || '', req.params.employeeId, period_start);
+  const sub = db.prepare('SELECT * FROM timecard_submissions WHERE employee_id = ? AND period_start = ?').get(req.params.employeeId, period_start);
+  res.json({ ok: true, submission: sub });
+});
+
 // ── ENTRIES (admin) ──
 app.get('/api/entries/:employeeId', (req, res) => {
   const { start, end } = req.query;

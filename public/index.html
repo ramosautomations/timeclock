@@ -1193,9 +1193,15 @@ let editSubEmpId=null, editSubPeriodStart=null, editSubPeriodEnd=null;
 
 async function quickUnlock(empId, empName, ps) {
   if (!confirm(`Reopen the time card for ${empName}? They will be able to add entries and resubmit.`)) return;
-  const r = await fetch(`/api/submission/${empId}?period_start=${ps}`, { method: 'DELETE' });
-  if (!r.ok) { alert('Error reopening period.'); return; }
-  await loadReport();
+  try {
+    const url = `/api/submission/${empId}?period_start=${encodeURIComponent(ps)}`;
+    const r = await fetch(url, { method: 'DELETE' });
+    const d = await r.json();
+    if (!r.ok) { alert('Error: ' + (d.error || 'Could not reopen period.')); return; }
+    await loadReport();
+  } catch(e) {
+    alert('Network error. Please try again.');
+  }
 }
 
 async function openEditSubModal(empId, empName, ps, pe) {
@@ -1238,10 +1244,16 @@ async function saveSubNotes() {
 
 async function confirmUnlockSub() {
   if (!confirm(`Unlock this time card? The employee will be able to add entries and resubmit.`)) return;
-  const r = await fetch(`/api/submission/${editSubEmpId}?period_start=${editSubPeriodStart}`, { method: 'DELETE' });
-  if (!r.ok) { document.getElementById('edit-sub-err').textContent = 'Error unlocking.'; return; }
-  closeAllModals();
-  await loadReport();
+  try {
+    const url = `/api/submission/${editSubEmpId}?period_start=${encodeURIComponent(editSubPeriodStart)}`;
+    const r = await fetch(url, { method: 'DELETE' });
+    const d = await r.json();
+    if (!r.ok) { document.getElementById('edit-sub-err').textContent = d.error || 'Error unlocking.'; return; }
+    closeAllModals();
+    await loadReport();
+  } catch(e) {
+    document.getElementById('edit-sub-err').textContent = 'Network error.';
+  }
 }
 
 // ── TIMECARD SUBMISSION ──
