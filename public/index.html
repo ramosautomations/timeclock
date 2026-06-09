@@ -69,6 +69,8 @@ input, button, select { font-family: var(--sans); -webkit-appearance: none; appe
 .sub-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 99px; }
 .sub-badge.submitted { background: rgba(34,197,94,0.12); color: #22c55e; border: 1px solid #22c55e; }
 .sub-badge.pending { background: var(--amber-dim); color: var(--amber); border: 1px solid var(--amber); }
+.sub-actions-row { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.sub-btn-group { display: flex; gap: 6px; }
 
 /* ── NOTES MODAL ── */
 .modal-field textarea { width: 100%; background: var(--surface2); border: 1.5px solid var(--border2); color: var(--text); font-size: 14px; font-family: var(--sans); padding: 10px 14px; border-radius: var(--radius-sm); resize: vertical; min-height: 100px; }
@@ -199,9 +201,9 @@ input, button, select { font-family: var(--sans); -webkit-appearance: none; appe
 /* report cards mobile */
 .report-card { padding: 14px 16px; border-bottom: 1.5px solid var(--border); }
 .report-card:last-child { border-bottom: none; }
-.report-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; gap: 8px; }
+.report-card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; gap: 8px; flex-wrap: wrap; }
 .report-card-name { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 14px; min-width: 0; }
-.report-card-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.report-card-actions { display: flex; gap: 6px; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
 .hours-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 10px; }
 @media(min-width:400px){ .hours-grid { grid-template-columns: repeat(4, 1fr); } }
 .hours-grid.six { grid-template-columns: repeat(3, 1fr); }
@@ -1049,9 +1051,13 @@ async function loadReport(){ allExpanded=false; const eab=document.getElementByI
       <div class="hstat ${TYPE_HSTAT[t]}"><span class="hl">${t}</span><span class="hv">${((row.byType[t]||0)/60).toFixed(1)}h</span></div>`).join('');
 
     const subBadge = row.submission
-      ? `<span class="sub-badge submitted">✓ Submitted ${new Date(row.submission.submitted_at).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>
-         <button class="action-btn edit" onclick="openEditSubModal(${row.employee.id},'${esc(row.employee.name)}','${ps}','${pe}')">✏ Edit</button>
-         <button class="action-btn" style="border-color:#f59e0b;color:#f59e0b" onclick="quickUnlock(${row.employee.id},'${esc(row.employee.name)}','${ps}')">🔓 Reopen</button>`
+      ? `<div class="sub-actions-row">
+           <span class="sub-badge submitted">✓ Submitted ${new Date(row.submission.submitted_at).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>
+           <div class="sub-btn-group">
+             <button class="action-btn edit" onclick="openEditSubModal(${row.employee.id},'${esc(row.employee.name)}','${ps}','${pe}')">✏ Edit</button>
+             <button class="action-btn" style="border-color:#f59e0b;color:#f59e0b" onclick="quickUnlock(${row.employee.id},'${esc(row.employee.name)}','${ps}')">🔓 Reopen</button>
+           </div>
+         </div>`
       : `<span class="sub-badge pending">⏳ Pending</span>`;
     const subNotes = row.submission && row.submission.notes
       ? `<div style="font-size:12px;color:var(--muted);padding:8px 16px 0;font-style:italic">Notes: ${row.submission.notes}</div>` : '';
